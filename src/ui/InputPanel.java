@@ -14,6 +14,7 @@ public class InputPanel extends JScrollPane {
     private static String PROOF_TO_DECLARATION_BTN_MSG = "Edit declaration";
 
     private final Logic logic;
+    private final Runnable refreshParent;
     private final JPanel variableHeader;
     private final JTextField variableInput;
     private final List<VariableCard> variables;
@@ -22,9 +23,10 @@ public class InputPanel extends JScrollPane {
     private final JPanel startProofBtnPanel;
     private final List<JButton> buttons;
 
-    public InputPanel(Logic logic) {
+    public InputPanel(Logic logic, Runnable refreshParent) {
         super(panel);
         this.logic = logic;
+        this.refreshParent = refreshParent;
 
         setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         setPreferredSize(new Dimension(300, 570));
@@ -51,7 +53,10 @@ public class InputPanel extends JScrollPane {
                 variableInput.setText("");
                 constructPanel();
             } catch (VariableNameException vne) {
-                // TODO
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
+                        vne.getMessage(),
+                        "Invalid Variable Name Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -87,6 +92,11 @@ public class InputPanel extends JScrollPane {
                     button.setEnabled(true);
                     variableInput.setEditable(true);
                     theoremInput.setEditable(true);
+                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
+                            "Records in the proof panel will be clicked",
+                            "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                    refreshParent.run();
                 }
             }
             logic.switchMode();

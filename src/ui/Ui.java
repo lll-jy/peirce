@@ -5,10 +5,6 @@ import logic.Logic;
 import javax.swing.*;
 import java.awt.*;
 
-/*
-References:
-https://www.guru99.com/java-swing-gui.html
- */
 public class Ui {
     private final JFrame frame;
 
@@ -21,13 +17,16 @@ public class Ui {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Panel setup
-        JMenuBar menuBar = new MenuBar();
-        JScrollPane inputPanel = new InputPanel(logic);
-
         JPanel panel = new JPanel();
         JPanel proofPanel = new JPanel();
         proofPanel.add(new JLabel("test 2"));
         panel.add(proofPanel);
+
+        JMenuBar menuBar = new MenuBar();
+        JScrollPane inputPanel = new InputPanel(logic, () -> {
+            panel.revalidate();
+            panel.repaint();
+        });
 
         // Frame building
         frame.setVisible(true);
