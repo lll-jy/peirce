@@ -8,6 +8,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The panel that handles variable and theorem declaration.
+ */
 public class InputPanel extends JScrollPane {
     private static JPanel panel = new JPanel();
     private static String DECLARATION_TO_PROOF_BTN_MSG = "Start proof";
@@ -23,6 +26,11 @@ public class InputPanel extends JScrollPane {
     private final JPanel startProofBtnPanel;
     private final List<JButton> buttons;
 
+    /**
+     * Initializes an input panel.
+     * @param logic the component that handles with the logic.
+     * @param refreshParent a runnable component that refreshes parent panel.
+     */
     public InputPanel(Logic logic, Runnable refreshParent) {
         super(panel);
         this.logic = logic;
@@ -49,7 +57,7 @@ public class InputPanel extends JScrollPane {
             try {
                 String input = variableInput.getText();
                 logic.addVariable(input);
-                variables.add(new VariableCard(input, variables, variableInput, this::constructPanel, true));
+                variables.add(new VariableCard(input, variables, variableInput, this::constructPanel));
                 variableInput.setText("");
                 constructPanel();
             } catch (VariableNameException vne) {
@@ -61,7 +69,7 @@ public class InputPanel extends JScrollPane {
         });
 
         for (String variableName : logic.getVariables()) {
-            variables.add(new VariableCard(variableName, variables, variableInput, this::constructPanel, true));
+            variables.add(new VariableCard(variableName, variables, variableInput, this::constructPanel));
         }
 
         langSelectorPanel = new JPanel();
@@ -108,6 +116,9 @@ public class InputPanel extends JScrollPane {
         constructPanel();
     }
 
+    /**
+     * Refresh this panel.
+     */
     private void constructPanel() {
         panel.removeAll();
         panel.revalidate();

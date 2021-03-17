@@ -2,7 +2,13 @@ package ui;
 
 import javax.swing.*;
 
+/**
+ * The menubar of the application.
+ */
 public class MenuBar extends JMenuBar {
+    /**
+     * Initializes the menubar.
+     */
     public MenuBar() {
         super();
         JMenu fileMenu = new JMenu("File");
