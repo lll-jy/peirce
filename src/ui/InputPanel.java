@@ -1,7 +1,7 @@
 package ui;
 
-import model.Model;
-import model.VariableNameException;
+import logic.Logic;
+import logic.VariableNameException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,17 +10,19 @@ import java.util.List;
 
 public class InputPanel extends JScrollPane {
     private static JPanel panel = new JPanel();
-    private final Model model;
+    private final Logic logic;
     private final JPanel variableHeader;
     private final JTextField variableInput;
     private final List<VariableCard> variables;
+    private final JPanel langSelectorPanel;
+    private final JTextArea theoremInput;
 
-    public InputPanel(Model model) {
+    public InputPanel(Logic logic) {
         super(panel);
-        this.model = model;
+        this.logic = logic;
 
         setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        setPreferredSize(new Dimension(350, 570));
+        setPreferredSize(new Dimension(300, 570));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         variableHeader = new JPanel();
@@ -33,10 +35,11 @@ public class InputPanel extends JScrollPane {
 
         variables = new ArrayList<>();
         variableInput = new JTextField();
+        variableInput.setMaximumSize(new Dimension(290, 30));
         addVariableBtn.addActionListener(e -> {
             try {
                 String input = variableInput.getText();
-                model.insertVariable(input);
+                logic.addVariable(input);
                 variables.add(new VariableCard(input, variables, variableInput, this::constructPanel));
                 variableInput.setText("");
                 constructPanel();
@@ -45,16 +48,22 @@ public class InputPanel extends JScrollPane {
             }
         });
 
-        for (String variableName : model.getVariables()) {
+        for (String variableName : logic.getVariables()) {
             variables.add(new VariableCard(variableName, variables, variableInput, this::constructPanel));
         }
 
-        constructPanel();
-        panel.add(new JLabel("\n"));
-        for (int i = 0; i < 100; i++) {
-            panel.add(new JLabel("test2 " + i + "\n"));
-        }
+        langSelectorPanel = new JPanel();
+        String[] languages = List.of("Coq", "LaTeX").toArray(new String[0]);
+        JComboBox<String> langSelector = new JComboBox<>(languages);
+        langSelectorPanel.add(new JLabel("Language: "));
+        langSelectorPanel.add(langSelector);
+        langSelectorPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
 
+        theoremInput = new JTextArea();
+        theoremInput.setLineWrap(true);
+        theoremInput.setMargin(new Insets(5, 5, 5, 5));
+
+        constructPanel();
     }
 
     private void constructPanel() {
@@ -66,5 +75,7 @@ public class InputPanel extends JScrollPane {
         for (VariableCard variableCard : variables) {
             panel.add(variableCard);
         }
+        panel.add(langSelectorPanel);
+        panel.add(theoremInput);
     }
 }

@@ -1,4 +1,4 @@
-package model;
+package logic;
 
 public class VariableNameException extends Exception {
     public VariableNameException(String msg) {

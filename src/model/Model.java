@@ -1,5 +1,7 @@
 package model;
 
+import logic.VariableNameException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +16,7 @@ public class Model {
         return variables;
     }
 
-    public void insertVariable(String varName) throws VariableNameException {
+    public void insertVariable(String varName) {
         variables.add(varName);
     }
 }

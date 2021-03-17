@@ -1,6 +1,6 @@
 package ui;
 
-import model.Model;
+import logic.Logic;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,13 +16,13 @@ public class Ui {
         frame = new JFrame("Peirce Alpha Proof Assistant");
     }
 
-    public void construct(Model model) {
+    public void construct(Logic logic) {
         // Frame creation
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Panel setup
         JMenuBar menuBar = new MenuBar();
-        JScrollPane inputPanel = new InputPanel(model);
+        JScrollPane inputPanel = new InputPanel(logic);
 
         JPanel panel = new JPanel();
         JPanel proofPanel = new JPanel();
