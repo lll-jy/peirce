@@ -2,6 +2,7 @@ package ui;
 
 import logic.Logic;
 import logic.exceptions.VariableNameException;
+import logic.parser.Parser;
 
 import javax.swing.*;
 import java.awt.*;
@@ -94,6 +95,11 @@ public class InputPanel extends JScrollPane {
                     variableInput.setEditable(false);
                     theoremInput.setEditable(false);
                     // TODO
+                    Object result = Parser.createParser(logic.getLanguage()).parse(theoremInput.getText());
+                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
+                            result + "\n" + logic.getLanguage(),
+                            "", JOptionPane.WARNING_MESSAGE
+                            );
                 }
             } else {
                 startProofBtn.setText(DECLARATION_TO_PROOF_BTN_MSG);

@@ -22,7 +22,7 @@ public class LatexParser extends Parser {
     };
 
     @Override
-    public String[] tokenize(String theorem) {
+    protected String[] tokenize(String theorem) {
         List<String> tokens = new ArrayList<>();
         int length = theorem.length();
         int pointer = 0;

@@ -88,4 +88,12 @@ public class Logic {
             case PROOF -> mode = Mode.DECLARATION;
         }
     }
+
+    /**
+     * Gets the language for declaration that is currently used.
+     * @return the language used in application at this point in time.
+     */
+    public Language getLanguage() {
+        return language;
+    }
 }

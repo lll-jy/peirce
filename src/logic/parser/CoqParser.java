@@ -10,7 +10,7 @@ public class CoqParser extends Parser {
     public static String[] coqNotations = new String[]{"/\\", "\\/", "~", "<->", "->", "(", ")"};
 
     @Override
-    public String[] tokenize(String theorem) {
+    protected String[] tokenize(String theorem) {
         List<String> tokens = new ArrayList<>();
         int length = theorem.length();
         int pointer = 0;
