@@ -1,5 +1,6 @@
 package logic.parser;
 
+import logic.Language;
 import logic.exceptions.TheoremParseException;
 import model.Literal;
 import model.Proposition;
@@ -26,7 +27,7 @@ public class CoqParser extends Parser {
         int pointer = 0;
         while (pointer < length) {
             String substring = theorem.substring(pointer);
-            if (substring.startsWith(" ")) {
+            if (startsWithBlank(substring)) {
                 pointer++;
             } else {
                 boolean startsWithNotation = false;
@@ -60,6 +61,11 @@ public class CoqParser extends Parser {
             }
         }
         return tokens.toArray(new String[0]);
+    }
+
+    @Override
+    protected Language languageUsed() {
+        return Language.Coq;
     }
 
     @Override

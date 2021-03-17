@@ -1,5 +1,6 @@
 package logic.parser;
 
+import logic.Language;
 import logic.exceptions.TheoremParseException;
 
 import java.util.ArrayList;
@@ -11,7 +12,8 @@ import java.util.List;
  */
 public class LatexParser extends Parser {
     public static void main(String[] args) throws Exception {
-        Runtime.getRuntime().exec("swipl -f prolog/syntax.pl");
+        //Runtime.getRuntime().exec("swipl -f prolog/syntax.pl");
+
     }
 
     public static String[] latexNotations = new String[]{
@@ -34,7 +36,7 @@ public class LatexParser extends Parser {
         int pointer = 0;
         while (pointer < length) {
             String substring = theorem.substring(pointer);
-            if (substring.startsWith(" ")) {
+            if (startsWithBlank(substring)) {
                 pointer++;
             } else if (substring.startsWith("(")) {
                 pointer++;
@@ -58,7 +60,7 @@ public class LatexParser extends Parser {
 
     private int getNextIndex(String substring) {
         int index = substring.length();
-        String[] delimits = new String[]{"\\", " ", "(", ")"};
+        String[] delimits = new String[]{"\\", " ", "\n", "\t", "(", ")"};
         for (String delimit : delimits) {
             int thisIndex = substring.indexOf(delimit);
             if (thisIndex > 0 && thisIndex < index) {
@@ -66,6 +68,11 @@ public class LatexParser extends Parser {
             }
         }
         return index;
+    }
+
+    @Override
+    protected Language languageUsed() {
+        return Language.LaTeX;
     }
 
     @Override

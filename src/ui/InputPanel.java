@@ -1,6 +1,7 @@
 package ui;
 
 import logic.Logic;
+import logic.exceptions.TheoremParseException;
 import logic.exceptions.VariableNameException;
 import logic.parser.Parser;
 
@@ -89,19 +90,30 @@ public class InputPanel extends JScrollPane {
         startProofBtnPanel.add(startProofBtn);
         startProofBtn.addActionListener(e -> {
             if (logic.canModifyDeclaration()) {
-                startProofBtn.setText(PROOF_TO_DECLARATION_BTN_MSG);
-                for (JButton button : buttons) {
-                    button.setEnabled(false);
-                    variableInput.setEditable(false);
-                    theoremInput.setEditable(false);
-                    logic.setLanguage((String) langSelector.getSelectedItem());
+                try {
                     // TODO
                     Object result = Parser.createParser(logic.getLanguage(), logic.getVariables())
                             .parse(theoremInput.getText());
+                    startProofBtn.setText(PROOF_TO_DECLARATION_BTN_MSG);
+                    logic.setLanguage((String) langSelector.getSelectedItem());
+                    for (JButton button : buttons) {
+                        button.setEnabled(false);
+                        variableInput.setEditable(false);
+                        theoremInput.setEditable(false);
+                    }
+                    logic.switchMode();
+                    for (VariableCard card : variables) {
+                        card.switchEditable();
+                    }
                     JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
                             result + "\n" + logic.getLanguage(),
                             "", JOptionPane.WARNING_MESSAGE
-                            );
+                    );
+                } catch (TheoremParseException tpe) {
+                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
+                            tpe.getMessage(),
+                            "", JOptionPane.ERROR_MESSAGE
+                    );
                 }
             } else {
                 startProofBtn.setText(DECLARATION_TO_PROOF_BTN_MSG);
@@ -109,16 +121,16 @@ public class InputPanel extends JScrollPane {
                     button.setEnabled(true);
                     variableInput.setEditable(true);
                     theoremInput.setEditable(true);
-                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
-                            "Records in the proof panel will be clicked",
-                            "Warning",
-                            JOptionPane.WARNING_MESSAGE);
-                    refreshParent.run();
                 }
-            }
-            logic.switchMode();
-            for (VariableCard card : variables) {
-                card.switchEditable();
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
+                        "Records in the proof panel will be clicked",
+                        "Warning",
+                        JOptionPane.WARNING_MESSAGE);
+                refreshParent.run();
+                logic.switchMode();
+                for (VariableCard card : variables) {
+                    card.switchEditable();
+                }
             }
         });
 
