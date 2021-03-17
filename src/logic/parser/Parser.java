@@ -4,7 +4,6 @@ import logic.Language;
 import logic.exceptions.TheoremParseException;
 import model.CutLiteral;
 import model.GroundLiteral;
-import model.Literal;
 import model.Proposition;
 
 import java.io.File;
@@ -25,6 +24,10 @@ public abstract class Parser {
 
     protected final List<String> variables;
 
+    /**
+     * Creates a parser instance.
+     * @param variables the list of variables recognizable.
+     */
     public Parser(List<String> variables) {
         this.variables = variables;
     }
@@ -59,8 +62,13 @@ public abstract class Parser {
         };
     }
 
-    // TODO: temporary
-    public Object parse(String theorem) throws TheoremParseException {
+    /**
+     * Parse a given theorem to Peirce proposition.
+     * @param theorem the string of the theorem given.
+     * @return the proposition constructed based on the input string.
+     * @throws TheoremParseException if the input theorem to parse is invalid.
+     */
+    public Proposition parse(String theorem) throws TheoremParseException {
         if (theorem.equals("")) {
             throw new TheoremParseException(EMPTY_ERR_MSG);
         }
@@ -87,6 +95,7 @@ public abstract class Parser {
                 level++;
                 CutLiteral thisLiteral = new CutLiteral(proposition, null);
                 stack.push(thisLiteral);
+                proposition.addLiteral(thisLiteral);
                 proposition = new Proposition(level, thisLiteral);
             } else if (peirceFrames[i].equals("]")) {
                 level--;
@@ -96,20 +105,20 @@ public abstract class Parser {
             } else {
                 proposition.addLiteral(new GroundLiteral(proposition, peirceFrames[i]));
             }
-            System.out.println(proposition);
-            System.out.println(stack);
         }
-
-
-        try {
-            return List.of(peirceFrames).toString();
-        } catch (Exception e) {
-            return null;
-        }
+        return proposition;
     }
 
+    /**
+     * Gets the language used by the parse.
+     * @return the language.
+     */
     abstract protected Language languageUsed();
 
+    /**
+     * Writes tokens to the file at "prolog/tokens.txt".
+     * @param tokens the array of tokens strings.
+     */
     protected void writeTokensToFile(String[] tokens) {
         try {
             FileWriter fw = new FileWriter("prolog/tokens.txt");
@@ -124,6 +133,4 @@ public abstract class Parser {
             assert false;
         }
     };
-
-    abstract protected String parse(String[] tokens);
 }

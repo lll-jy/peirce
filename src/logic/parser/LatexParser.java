@@ -11,11 +11,6 @@ import java.util.List;
  * Parser of LaTeX.
  */
 public class LatexParser extends Parser {
-    public static void main(String[] args) throws Exception {
-        //Runtime.getRuntime().exec("swipl -f prolog/syntax.pl");
-
-    }
-
     public static String[] latexNotations = new String[]{
             "\\land", "\\wedge", // Conjunction
             "\\lor", "\\vee", // Disjunction
@@ -73,11 +68,5 @@ public class LatexParser extends Parser {
     @Override
     protected Language languageUsed() {
         return Language.LaTeX;
-    }
-
-    @Override
-    protected String parse(String[] tokens) {
-        // TODO
-        return null;
     }
 }

@@ -2,13 +2,10 @@ package logic.parser;
 
 import logic.Language;
 import logic.exceptions.TheoremParseException;
-import model.Literal;
-import model.Proposition;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Parser of Coq.
@@ -66,10 +63,5 @@ public class CoqParser extends Parser {
     @Override
     protected Language languageUsed() {
         return Language.Coq;
-    }
-
-    @Override
-    protected String parse(String[] tokens) {
-        return null;
     }
 }
