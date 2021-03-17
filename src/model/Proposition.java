@@ -24,6 +24,10 @@ public class Proposition {
         this.literals.addAll(literals);
     }
 
+    public void addLiteral(Literal literal) {
+        this.literals.add(literal);
+    }
+
     public CutLiteral getEnclosingLiteral() {
         return enclosingLiteral;
     }

@@ -6,4 +6,8 @@ public abstract class Literal {
     public Literal(Proposition parent) {
         this.parent = parent;
     }
+
+    public Proposition getParent() {
+        return parent;
+    }
 }

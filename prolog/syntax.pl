@@ -50,8 +50,42 @@ latex_biconditional --> ["\\equiv"].
 latex_biconditional --> ["\\leftrightarrow"].
 latex_biconditional --> ["\\iff"].
 
-functor_to_peirce(
+functor_to_peirce(X,[X]):-string(X),!.
+functor_to_peirce(l(X),L):-!, functor_to_peirce(X,L).
+functor_to_peirce(not(X),[frame(L)]):-!, functor_to_peirce(X,L).
+functor_to_peirce(and(X,Y),L):-
+  functor_to_peirce(X,XL), functor_to_peirce(Y,YL),
+  append(XL,YL,L).
 
-:-read_file(Lang,Tokens),writeln(Lang),writeln(Tokens),latex_prop(X,Tokens,[]),writeln(X).
+/*
+peirce_expr_term(X,Y):-string(X), !, string_concat(X," ",Y).
+peirce_expr_term(frame(L),S):-
+  peirce_expression(L,FS), string_concat("[ ",FS,Temp),
+  string_concat(Temp,"] ",S).
+peirce_expression([],"").
+peirce_expression([H|T]
+*/
+
+write_to_stream([],_):-!.
+write_to_stream([H|T],O):-
+  write_literal(H,O), write_to_stream(T,O).
+
+write_literal(frame(X),O):-
+  !, write(O,"[ "), write_to_stream(X,O), write(O,"] ").
+write_literal(X,O):-
+  string(X), write(O,X), write(O," ").
+
+write_file(P):-
+  open("prolog/peirce.txt",write,O), write_to_stream(P,O), close(O).
+
+get_structure(S):-
+  read_file("Coq",Tokens), !, coq_prop(S,Tokens,[]).
+get_structure(S):-
+  read_file("LeTeX",Tokens), latex_prop(S,Tokens,[]).
+
+execute:-
+  get_structure(S), functor_to_peirce(S,L), write_file(L).
+
+:-execute.
 
 :-halt.

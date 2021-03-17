@@ -2,11 +2,18 @@ package logic.parser;
 
 import logic.Language;
 import logic.exceptions.TheoremParseException;
+import model.CutLiteral;
+import model.GroundLiteral;
+import model.Literal;
 import model.Proposition;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
+import java.util.Stack;
 
 /**
  * Parser that parses theorems.
@@ -14,6 +21,7 @@ import java.util.List;
 public abstract class Parser {
     public static String INVALID_TOKENS_ERR_MSG = "Please check your theorem, some tokens are invalid.";
     public static String INVALID_SYNTAX_ERR_MSG = "Please check your theorem, the syntax seems incorrect.";
+    public static String EMPTY_ERR_MSG = "Please enter your theorem to prove.";
 
     protected final List<String> variables;
 
@@ -53,16 +61,48 @@ public abstract class Parser {
 
     // TODO: temporary
     public Object parse(String theorem) throws TheoremParseException {
+        if (theorem.equals("")) {
+            throw new TheoremParseException(EMPTY_ERR_MSG);
+        }
         String[] tokens = tokenize(theorem);
         writeTokensToFile(tokens);
         try {
-            Runtime.getRuntime().exec("swipl -f prolog/syntax.pl");
-        } catch (IOException e) {
+            Runtime.getRuntime().exec("swipl -f prolog/syntax.pl").waitFor();
+        } catch (Exception e) {
             throw new TheoremParseException(INVALID_SYNTAX_ERR_MSG);
         }
+        File frameFile = new File("prolog/peirce.txt");
+        Scanner sc = null;
+        try {
+            sc = new Scanner(frameFile);
+        } catch (FileNotFoundException e) {
+            assert false;
+        }
+        String[] peirceFrames = sc.nextLine().split(" ");
+        int level = 0;
+        Proposition proposition = new Proposition();
+        Stack<CutLiteral> stack = new Stack<>();
+        for(int i = 0; i < peirceFrames.length; i++) {
+            if (peirceFrames[i].equals("[")) {
+                level++;
+                CutLiteral thisLiteral = new CutLiteral(proposition, null);
+                stack.push(thisLiteral);
+                proposition = new Proposition(level, thisLiteral);
+            } else if (peirceFrames[i].equals("]")) {
+                level--;
+                CutLiteral thisLiteral = stack.pop();
+                thisLiteral.setContent(proposition);
+                proposition = thisLiteral.getParent();
+            } else {
+                proposition.addLiteral(new GroundLiteral(proposition, peirceFrames[i]));
+            }
+            System.out.println(proposition);
+            System.out.println(stack);
+        }
+
 
         try {
-            return List.of(tokenize(theorem)).toString();
+            return List.of(peirceFrames).toString();
         } catch (Exception e) {
             return null;
         }
@@ -79,7 +119,6 @@ public abstract class Parser {
                 fw.write(t);
                 fw.write("\n");
             }
-            //fw.write("!!EOF\n");
             fw.close();
         } catch (IOException e) {
             assert false;
