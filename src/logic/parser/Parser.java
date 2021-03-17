@@ -31,4 +31,6 @@ public abstract class Parser {
     public Object parse(String theorem) {
         return List.of(tokenize(theorem)).toString();
     }
+
+    abstract protected String parse(String[] tokens);
 }

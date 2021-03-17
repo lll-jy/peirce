@@ -8,9 +8,14 @@ import java.util.List;
  */
 public class LatexParser extends Parser {
     public static void main(String[] args) {
-        System.out.println(List.of(new LatexParser().tokenize("p\\land q")));
-        System.out.println(List.of(new LatexParser().tokenize("p\\landq")));
-        System.out.println(List.of(new LatexParser().tokenize("p\\land(q\\equiv p)")));
+        try {
+            // Process p = Runtime.getRuntime().exec(new String[]{"sh", "-c", "swipl\n[test].^D"});
+            Process p = Runtime.getRuntime().exec(new String[]{"sh", "-c", "print a"});
+            System.out.println(p);
+        } catch (Exception e) {
+            System.out.println("error!");
+            System.out.println(e.toString());
+        }
     }
 
     public static String[] latexNotations = new String[]{
@@ -55,5 +60,11 @@ public class LatexParser extends Parser {
             }
         }
         return index;
+    }
+
+    @Override
+    protected String parse(String[] tokens) {
+        // TODO
+        return null;
     }
 }

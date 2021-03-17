@@ -46,4 +46,12 @@ public class CoqParser extends Parser {
         }
         return tokens.toArray(new String[0]);
     }
+
+    @Override
+    protected String parse(String[] tokens) {
+        for (int i = 0; i < tokens.length; i++) {
+            // TODO
+        }
+        return null;
+    }
 }
