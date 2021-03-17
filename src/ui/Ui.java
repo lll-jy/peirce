@@ -28,15 +28,16 @@ public class Ui {
 
         // Panel setup
         JPanel panel = new JPanel();
-        JPanel proofPanel = new JPanel();
-        proofPanel.add(new JLabel("test 2"));
-        panel.add(proofPanel);
-
         JMenuBar menuBar = new MenuBar();
         JScrollPane inputPanel = new InputPanel(logic, () -> {
             panel.revalidate();
             panel.repaint();
         });
+
+        JPanel proofPanel = new JPanel();
+        proofPanel.add(new JLabel("test 2"));
+        panel.add(proofPanel);
+        // TODO
 
         // Frame building
         frame.setVisible(true);

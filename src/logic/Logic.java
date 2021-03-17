@@ -1,5 +1,6 @@
 package logic;
 
+import logic.exceptions.VariableNameException;
 import model.Model;
 
 import java.util.List;

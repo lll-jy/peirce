@@ -1,4 +1,4 @@
-package logic;
+package logic.exceptions;
 
 /**
  * Exception for invalid variable name.

@@ -1,7 +1,7 @@
 package ui;
 
 import logic.Logic;
-import logic.VariableNameException;
+import logic.exceptions.VariableNameException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -93,6 +93,7 @@ public class InputPanel extends JScrollPane {
                     button.setEnabled(false);
                     variableInput.setEditable(false);
                     theoremInput.setEditable(false);
+                    // TODO
                 }
             } else {
                 startProofBtn.setText(DECLARATION_TO_PROOF_BTN_MSG);
