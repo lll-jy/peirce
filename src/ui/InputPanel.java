@@ -94,6 +94,7 @@ public class InputPanel extends JScrollPane {
                     button.setEnabled(false);
                     variableInput.setEditable(false);
                     theoremInput.setEditable(false);
+                    logic.setLanguage((String) langSelector.getSelectedItem());
                     // TODO
                     Object result = Parser.createParser(logic.getLanguage()).parse(theoremInput.getText());
                     JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),

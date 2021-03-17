@@ -96,4 +96,15 @@ public class Logic {
     public Language getLanguage() {
         return language;
     }
+
+    /**
+     * Sets the language for declaration.
+     * @param language the string representing the language.
+     */
+    public void setLanguage(String language) {
+        switch (language) {
+            case "Coq" -> this.language = Language.Coq;
+            case "LaTeX" -> this.language = Language.LaTeX;
+        }
+    }
 }
