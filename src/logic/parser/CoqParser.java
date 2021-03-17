@@ -1,7 +1,13 @@
 package logic.parser;
 
+import logic.exceptions.TheoremParseException;
+import model.Literal;
+import model.Proposition;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Parser of Coq.
@@ -9,8 +15,12 @@ import java.util.List;
 public class CoqParser extends Parser {
     public static String[] coqNotations = new String[]{"/\\", "\\/", "~", "<->", "->", "(", ")"};
 
+    public CoqParser(List<String> variables) {
+        super(variables);
+    }
+
     @Override
-    protected String[] tokenize(String theorem) {
+    protected String[] tokenize(String theorem) throws TheoremParseException {
         List<String> tokens = new ArrayList<>();
         int length = theorem.length();
         int pointer = 0;
@@ -44,14 +54,16 @@ public class CoqParser extends Parser {
                 }
             }
         }
+        for (String t : tokens) {
+            if (!variables.contains(t) && !Arrays.asList(coqNotations).contains(t)) {
+                throw new TheoremParseException(INVALID_TOKENS_ERR_MSG);
+            }
+        }
         return tokens.toArray(new String[0]);
     }
 
     @Override
     protected String parse(String[] tokens) {
-        for (int i = 0; i < tokens.length; i++) {
-            // TODO
-        }
         return null;
     }
 }

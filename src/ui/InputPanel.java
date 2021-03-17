@@ -96,7 +96,8 @@ public class InputPanel extends JScrollPane {
                     theoremInput.setEditable(false);
                     logic.setLanguage((String) langSelector.getSelectedItem());
                     // TODO
-                    Object result = Parser.createParser(logic.getLanguage()).parse(theoremInput.getText());
+                    Object result = Parser.createParser(logic.getLanguage(), logic.getVariables())
+                            .parse(theoremInput.getText());
                     JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
                             result + "\n" + logic.getLanguage(),
                             "", JOptionPane.WARNING_MESSAGE

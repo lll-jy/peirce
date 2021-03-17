@@ -1,21 +1,17 @@
 package logic.parser;
 
+import logic.exceptions.TheoremParseException;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Parser of LaTeX.
  */
 public class LatexParser extends Parser {
-    public static void main(String[] args) {
-        try {
-            // Process p = Runtime.getRuntime().exec(new String[]{"sh", "-c", "swipl\n[test].^D"});
-            Process p = Runtime.getRuntime().exec(new String[]{"sh", "-c", "print a"});
-            System.out.println(p);
-        } catch (Exception e) {
-            System.out.println("error!");
-            System.out.println(e.toString());
-        }
+    public static void main(String[] args) throws Exception {
+        Runtime.getRuntime().exec("swipl -f prolog/syntax.pl");
     }
 
     public static String[] latexNotations = new String[]{
@@ -23,11 +19,16 @@ public class LatexParser extends Parser {
             "\\lor", "\\vee", // Disjunction
             "\\lnot", "\\neg", "\\sim", // Negation
             "\\Rightarrow", "\\to", "\\rightarrow", "\\supset", "\\implies", //Implication
-            "\\Leftrightarrow", "\\equiv", "\\leftrightarrow", "\\iff" // Bi-conditional
+            "\\Leftrightarrow", "\\equiv", "\\leftrightarrow", "\\iff", // Bi-conditional
+            "(", ")"
     };
 
+    public LatexParser(List<String> variables) {
+        super(variables);
+    }
+
     @Override
-    protected String[] tokenize(String theorem) {
+    protected String[] tokenize(String theorem) throws TheoremParseException {
         List<String> tokens = new ArrayList<>();
         int length = theorem.length();
         int pointer = 0;
@@ -45,6 +46,11 @@ public class LatexParser extends Parser {
                 int index = getNextIndex(substring);
                 tokens.add(substring.substring(0, index));
                 pointer += index;
+            }
+        }
+        for (String t : tokens) {
+            if (!variables.contains(t) && !Arrays.asList(latexNotations).contains(t)) {
+                throw new TheoremParseException(INVALID_TOKENS_ERR_MSG);
             }
         }
         return tokens.toArray(new String[0]);

@@ -19,4 +19,16 @@ public class Proposition {
         this.enclosingLiteral = enclosingLiteral;
         literals = new ArrayList<>();
     }
+
+    public void addLiterals(List<Literal> literals) {
+        this.literals.addAll(literals);
+    }
+
+    public CutLiteral getEnclosingLiteral() {
+        return enclosingLiteral;
+    }
+
+    public List<Literal> getLiterals() {
+        return literals;
+    }
 }
