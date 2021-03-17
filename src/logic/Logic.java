@@ -55,6 +55,14 @@ public class Logic {
     }
 
     /**
+     * Invalidates a variable that is recognized.
+     * @param varName the name of the variable want to be invalidated.
+     */
+    public void deleteVariable(String varName) {
+        model.removeVariable(varName);
+    }
+
+    /**
      * Gets the list of variables that is recognized by the application at any point of time.
      * @return the list of variable names recognizable.
      */

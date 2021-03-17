@@ -57,7 +57,7 @@ public class InputPanel extends JScrollPane {
             try {
                 String input = variableInput.getText();
                 logic.addVariable(input);
-                variables.add(new VariableCard(input, variables, variableInput, this::constructPanel));
+                variables.add(new VariableCard(logic, input, variables, variableInput, this::constructPanel));
                 variableInput.setText("");
                 constructPanel();
             } catch (VariableNameException vne) {
@@ -69,7 +69,7 @@ public class InputPanel extends JScrollPane {
         });
 
         for (String variableName : logic.getVariables()) {
-            variables.add(new VariableCard(variableName, variables, variableInput, this::constructPanel));
+            variables.add(new VariableCard(logic, variableName, variables, variableInput, this::constructPanel));
         }
 
         langSelectorPanel = new JPanel();

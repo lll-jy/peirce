@@ -32,4 +32,12 @@ public class Model {
     public void insertVariable(String varName) {
         variables.add(varName);
     }
+
+    /**
+     * Removes a particular variable.
+     * @param varName the name of variable to be removed.
+     */
+    public void removeVariable(String varName) {
+        variables.removeIf(x -> x.equals(varName));
+    }
 }
