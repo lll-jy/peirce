@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Propositions data structure.
@@ -51,6 +52,27 @@ public class Proposition {
         return literals;
     }
 
+    /**
+     * Checks whether a given proposition has the same list of literals as this proposition.
+     * @param p the other proposition to test.
+     * @return true if they have the same literal list regardless of order.
+     */
+    private boolean hasSameLiterals(Proposition p) {
+        if (p.literals.size() != literals.size()) {
+            return false;
+        } else {
+            List<Literal> copy = new ArrayList<>(literals);
+            for (Literal l : p.literals) {
+                if (copy.contains(l)) {
+                    copy.remove(l);
+                } else {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -58,5 +80,18 @@ public class Proposition {
             sb.append(l.toString());
         }
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Proposition)) return false;
+        Proposition that = (Proposition) o;
+        return hasSameLiterals(that);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getLiterals());
     }
 }
