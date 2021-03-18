@@ -63,7 +63,7 @@ public class ProofPanel extends JPanel {
             public void keyTyped(KeyEvent e) {
             }
 
-            // TODO: cut and paste
+            // TODO: logging
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_X && e.isControlDown()) {
@@ -119,8 +119,6 @@ public class ProofPanel extends JPanel {
         resultPanel.add(resultDisplay);
         addDoubleCutBtn.addActionListener(e -> {
             try {
-                // resultDisplay.setText(theoremDisplay.getSelectedText() + "\n" +
-                // clipboard.getData(DataFlavor.stringFlavor));
                 int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
                 int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
                 logic.addDoubleCut(start, end);
@@ -131,8 +129,6 @@ public class ProofPanel extends JPanel {
             }
         });
         removeDoubleCutBtn.addActionListener(e -> {
-            // resultDisplay.setText("" + logic.getTokenIndex(theoremDisplay.getCaretPosition()));
-            // resultDisplay.setText(logic.getTokenIndex(theoremDisplay.getSelectionStart()) + "," + logic.getTokenIndex(theoremDisplay.getSelectionEnd()));
             try {
                 int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
                 int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());

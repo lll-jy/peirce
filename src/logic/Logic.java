@@ -223,6 +223,13 @@ public class Logic {
         }
     }
 
+    /**
+     * Performs cut action to remove some part in the theorem by some inference rule.
+     * @param s the start token index to remove.
+     * @param e the end token index to remove.
+     * @throws InvalidSelectionException if the part selected is not of valid syntax to remove.
+     * @throws InvalidInferenceException if the part selected is not valid to remove by any inference rule.
+     */
     public void cut(int s, int e) throws InvalidSelectionException, InvalidInferenceException {
         List<Literal> literals = getSelected(s, e);
         Proposition parent = getCursorProp(s);
@@ -234,6 +241,14 @@ public class Logic {
         parent.replaceLiterals(literals, new ArrayList<>());
     }
 
+    /**
+     * Performs paste action to insert some diagrams to the theorem by some inference rule.
+     * @param pos the cursor position in terms of token index where the new diagram is to be inserted.
+     * @param str the string representing the proposition to insert.
+     * @throws TheoremParseException if the string (in the clipboard) is not a valid proposition.
+     * @throws InvalidSelectionException if the cursor position is invalid to insert anything.
+     * @throws InvalidInferenceException if the proposition cannot be inserted by any inference rule.
+     */
     public void paste(int pos, String str) throws TheoremParseException,
             InvalidSelectionException, InvalidInferenceException {
         Proposition prop = parse(str);
@@ -243,6 +258,7 @@ public class Logic {
                 throw new InvalidInferenceException("This diagram is not insertable to this place.");
             }
         }
+        // TODO: level change
         parent.insertLiterals(pos, prop.getLiterals());
     }
 }

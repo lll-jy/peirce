@@ -281,10 +281,19 @@ public class Proposition {
         }
     }
 
+    /**
+     * Checks whether this proposition is a single-literal proposition.
+     * @return true if this proposition is a single-literal proposition.
+     */
     public boolean isSingleLiteralProp() {
         return literals.size() == 1;
     }
 
+    /**
+     * Checks whether a literal can be inserted in this proposition.
+     * @param literal the literal to check.
+     * @return true if the literal can be inserted.
+     */
     public boolean canInsert(Literal literal) {
         // Insertion
         if (level % 2 == 1) {
