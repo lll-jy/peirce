@@ -10,6 +10,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * The panel that handles variable and theorem declaration.
@@ -23,7 +25,10 @@ public class InputPanel extends JScrollPane {
     private final Runnable refreshParent;
     private final JPanel variableHeader;
     private final JTextField variableInput;
-    private final List<VariableCard> variables;
+    private final List<Card> variables;
+    private final JPanel premiseHeader;
+    private final JTextField premiseInput;
+    private final List<Card> premises;
     private final JPanel langSelectorPanel;
     private final JTextArea theoremInput;
     private final JPanel startProofBtnPanel;
@@ -44,44 +49,43 @@ public class InputPanel extends JScrollPane {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         buttons = new ArrayList<>();
 
-        //
         variableHeader = new JPanel();
-        variableHeader.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
-        JLabel variableLabel = new JLabel("Add Variable: ");
-        JButton addVariableBtn = new JButton("Add");
-        addVariableBtn.setText("Add");
-        variableHeader.add(variableLabel);
-        variableHeader.add(addVariableBtn);
-        buttons.add(addVariableBtn);
-
         variables = new ArrayList<>();
         variableInput = new JTextField();
-        variableInput.setMaximumSize(new Dimension(290, 30));
-        addVariableBtn.addActionListener(e -> {
-            try {
-                String input = variableInput.getText();
-                logic.addVariable(input);
-                variables.add(new VariableCard(logic, input, variables, variableInput, this::constructPanel));
-                variableInput.setText("");
-                constructPanel();
-            } catch (VariableNameException vne) {
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
-                        vne.getMessage(),
-                        "Invalid Variable Name Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        });
 
-        for (String variableName : logic.getVariables()) {
-            variables.add(new VariableCard(logic, variableName, variables, variableInput, this::constructPanel));
-        }
-        //
+        constructListPanel("Variable", variableHeader, variables,
+                variableInput, i -> {
+                    try {
+                        logic.addVariable(i);
+                        return true;
+                    } catch (VariableNameException e) {
+                        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), e.getMessage(),
+                                "Invalid Variable Name Error", JOptionPane.ERROR_MESSAGE);
+                        return false;
+                    }
+                }, logic::getVariables, VariableCard.class);
 
         langSelectorPanel = new JPanel();
         JComboBox<String> langSelector = new JComboBox<>(Logic.languages);
         langSelectorPanel.add(new JLabel("Language: "));
         langSelectorPanel.add(langSelector);
         langSelectorPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+
+        premiseHeader = new JPanel();
+        premises = new ArrayList<>();
+        premiseInput = new JTextField();
+
+        constructListPanel("Premise", premiseHeader, premises,
+                premiseInput, i -> {
+                    try {
+                        logic.addPremise(i);
+                        return true;
+                    } catch (TheoremParseException e) {
+                        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), e.getMessage(),
+                                "Invalid Premise Error", JOptionPane.ERROR_MESSAGE);
+                        return false;
+                    }
+                }, logic::getPremises, PremiseCard.class);
 
         theoremInput = new JTextArea();
         theoremInput.setLineWrap(true);
@@ -101,10 +105,14 @@ public class InputPanel extends JScrollPane {
                     for (JButton button : buttons) {
                         button.setEnabled(false);
                         variableInput.setEditable(false);
+                        premiseInput.setEditable(false);
                         theoremInput.setEditable(false);
                     }
                     logic.switchMode();
-                    for (VariableCard card : variables) {
+                    for (Card card : variables) {
+                        card.switchEditable();
+                    }
+                    for (Card card : premises) {
                         card.switchEditable();
                     }
                     refreshParent.run();
@@ -118,16 +126,20 @@ public class InputPanel extends JScrollPane {
                 startProofBtn.setText(DECLARATION_TO_PROOF_BTN_MSG);
                 for (JButton button : buttons) {
                     button.setEnabled(true);
-                    variableInput.setEditable(true);
-                    theoremInput.setEditable(true);
                 }
+                variableInput.setEditable(true);
+                premiseInput.setEditable(true);
+                theoremInput.setEditable(true);
                 JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
                         "Records in the proof panel will be clicked",
                         "Warning",
                         JOptionPane.WARNING_MESSAGE);
                 refreshParent.run();
                 logic.switchMode();
-                for (VariableCard card : variables) {
+                for (Card card : variables) {
+                    card.switchEditable();
+                }
+                for (Card card : premises) {
                     card.switchEditable();
                 }
             }
@@ -136,10 +148,21 @@ public class InputPanel extends JScrollPane {
         constructPanel();
     }
 
-    // TODO: generic
-    private void constructListPanel(String type, JPanel header, List<VariableCard> cards, JTextField inputField) {
+    /**
+     * Constructs a list panel of add, edit, and delete implementation
+     * @param typeStr the string representing the type.
+     * @param header the header JPanel.
+     * @param cards the list of cards to display.
+     * @param inputField the input field for add and edit.
+     * @param add the add implementation function.
+     * @param getContents the supplier of the contents of entire list.
+     * @param type the class of the list.
+     */
+    private void constructListPanel(String typeStr, JPanel header, List<Card> cards,
+                                    JTextField inputField, Predicate<String> add, Supplier<List<String>> getContents,
+                                    Class<? extends Card> type) {
         header.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
-        JLabel label = new JLabel(String.format("Add %s: ", type));
+        JLabel label = new JLabel(String.format("Add %s: ", typeStr));
         JButton addBtn = new JButton("Add");
         addBtn.setText("Add");
         header.add(label);
@@ -150,20 +173,23 @@ public class InputPanel extends JScrollPane {
         addBtn.addActionListener(e -> {
             try {
                 String input = inputField.getText();
-                logic.addVariable(input);
-                cards.add(new VariableCard(logic, input, cards, inputField, this::constructPanel));
+                boolean isValid = add.test(input);
+                if (! isValid) {
+                    return;
+                }
+                cards.add(type
+                        .getConstructor(Logic.class, String.class, List.class, JTextField.class, Runnable.class)
+                        .newInstance(logic, input, cards, inputField, (Runnable) this::constructPanel));
                 inputField.setText("");
                 constructPanel();
-            } catch (VariableNameException vne) {
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
-                        vne.getMessage(),
-                        "Invalid Variable Name Error",
-                        JOptionPane.ERROR_MESSAGE);
+            } catch (Exception exception) {
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), exception.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        for (String variableName : logic.getVariables()) {
-            cards.add(new VariableCard(logic, variableName, cards, inputField, this::constructPanel));
+        for (String content : getContents.get()) {
+            cards.add(new VariableCard(logic, content, cards, inputField, this::constructPanel));
         }
     }
 
@@ -176,8 +202,13 @@ public class InputPanel extends JScrollPane {
         panel.repaint();
         panel.add(variableHeader);
         panel.add(variableInput);
-        for (VariableCard variableCard : variables) {
+        for (Card variableCard : variables) {
             panel.add(variableCard);
+        }
+        panel.add(premiseHeader);
+        panel.add(premiseInput);
+        for (Card premiseCard : premises) {
+            panel.add(premiseCard);
         }
         panel.add(langSelectorPanel);
         panel.add(theoremInput);

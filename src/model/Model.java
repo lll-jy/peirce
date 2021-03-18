@@ -9,6 +9,9 @@ import java.util.List;
  */
 public class Model {
     private final List<String> variables;
+    private final List<String> premisesStrings;
+    private final List<Proposition> premises;
+    // private final Proposition theorem; TODO: set theorem
     private Proposition proposition;
 
     /**
@@ -16,6 +19,8 @@ public class Model {
      */
     public Model() {
         variables = new ArrayList<>();
+        premisesStrings = new ArrayList<>();
+        premises = new ArrayList<>();
         proposition = new Proposition();
     }
 
@@ -25,6 +30,14 @@ public class Model {
      */
     public List<String> getVariables() {
         return variables;
+    }
+
+    /**
+     * Gets the list of premises recognizable in this model.
+     * @return the list of premises.
+     */
+    public List<String> getPremisesStrings() {
+        return premisesStrings;
     }
 
     /**
@@ -57,5 +70,25 @@ public class Model {
      */
     public void removeVariable(String varName) {
         variables.removeIf(x -> x.equals(varName));
+    }
+
+    /**
+     * Adds a new premise.
+     * @param str the premise string want to be added.
+     * @param prop the constructed proposition corresponding to the premise.
+     */
+    public void insertPremise(String str, Proposition prop) {
+        premisesStrings.add(str);
+        premises.add(prop);
+    }
+
+    /**
+     * Removes a particular premise.
+     * @param premise the string of the premise to be removed.
+     */
+    public void removePremise(String premise) {
+        int index = premisesStrings.indexOf(premise);
+        premisesStrings.remove(index);
+        premises.remove(index);
     }
 }

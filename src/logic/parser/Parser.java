@@ -15,11 +15,11 @@ import java.util.Scanner;
 import java.util.Stack;
 
 /**
- * Parser that parses theorems.
+ * Parser that parses proposition.
  */
 public abstract class Parser {
-    public static String INVALID_TOKENS_ERR_MSG = "Please check your theorem, some tokens are invalid.";
-    public static String INVALID_SYNTAX_ERR_MSG = "Please check your theorem, the syntax seems incorrect.";
+    public static String INVALID_TOKENS_ERR_MSG = "Please check your proposition, some tokens are invalid.";
+    public static String INVALID_SYNTAX_ERR_MSG = "Please check your proposition, the syntax seems incorrect.";
     public static String EMPTY_ERR_MSG = "Please enter your theorem to prove.";
 
     protected final List<String> variables;

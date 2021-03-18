@@ -56,6 +56,16 @@ public class Logic {
     }
 
     /**
+     * Adds a premise to the model.
+     * @param str the string representing the premise in the language chosen.
+     * @throws TheoremParseException if the input string is an invalid proposition of the language.
+     */
+    public void addPremise(String str) throws TheoremParseException {
+        Proposition prop = parse(str);
+        model.insertPremise(str, prop);
+    }
+
+    /**
      * Invalidates a variable that is recognized.
      * @param varName the name of the variable want to be invalidated.
      */
@@ -64,11 +74,27 @@ public class Logic {
     }
 
     /**
+     * Removes a premise.
+     * @param str the string representing the premise.
+     */
+    public void deletePremise(String str) {
+        model.removePremise(str);
+    }
+
+    /**
      * Gets the list of variables that is recognized by the application at any point of time.
      * @return the list of variable names recognizable.
      */
     public List<String> getVariables() {
         return model.getVariables();
+    }
+
+    /**
+     * Gets the list of premises that is recognized by the application at any point of time.
+     * @return the list of premises.
+     */
+    public List<String> getPremises() {
+        return model.getPremisesStrings();
     }
 
     /**

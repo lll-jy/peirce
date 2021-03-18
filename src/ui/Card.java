@@ -18,10 +18,13 @@ public class Card extends JPanel {
     protected final JButton deleteBtn;
 
     /**
-     * Initializes a variable card.
-     * @param content the name of the variable.
-     * @param cards the list of all variable cards (to help with edit and delete implementation).
-     * @param inputField the variable input field (to help with edit implementation).
+     * Initializes a card.
+     * @param logic the logic component that the card is running on.
+     * @param content the content of the card.
+     * @param formatStr the format string for display purpose.
+     * @param cards the list of all cards (to help with edit and delete).
+     * @param inputField the input field (to help with edit implementation).
+     * @param delete delete implementation.
      * @param refresh the runnable procedure refreshes the input panel after update.
      */
     public Card(Logic logic, String content, String formatStr, List<? extends Card> cards, JTextField inputField,
