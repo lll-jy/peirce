@@ -3,15 +3,18 @@ package ui;
 import logic.Logic;
 import logic.exceptions.InvalidInferenceException;
 import logic.exceptions.InvalidSelectionException;
+import logic.exceptions.TheoremParseException;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 
 public class ProofPanel extends JPanel {
     private final Logic logic;
@@ -74,7 +77,20 @@ public class ProofPanel extends JPanel {
                         resultDisplay.setText(err.getMessage());
                     }
                 } else if (e.getKeyCode() == KeyEvent.VK_V && e.isControlDown()) {
-                    resultDisplay.setText("paste");
+                    try {
+                        int pos = logic.getTokenIndex(theoremDisplay.getSelectionStart());
+                        if (pos != logic.getTokenIndex(theoremDisplay.getSelectionEnd())) {
+                            throw new InvalidSelectionException("Please place your cursor in a deterministic " +
+                                    "position to insert new propositions.");
+                        }
+                        String toInsert = clipboard.getData(DataFlavor.stringFlavor).toString();
+                        logic.paste(pos, toInsert);
+                        theoremDisplay.setText(logic.getProposition().toString());
+                        resultDisplay.setText(String.format("%s inserted to %d", toInsert, pos));
+                    } catch (InvalidSelectionException | InvalidInferenceException | TheoremParseException |
+                            UnsupportedFlavorException | IOException err) {
+                        resultDisplay.setText(err.getMessage());
+                    }
                 }
             }
 

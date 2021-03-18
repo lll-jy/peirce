@@ -233,4 +233,16 @@ public class Logic {
         }
         parent.replaceLiterals(literals, new ArrayList<>());
     }
+
+    public void paste(int pos, String str) throws TheoremParseException,
+            InvalidSelectionException, InvalidInferenceException {
+        Proposition prop = parse(str);
+        Proposition parent = getCursorProp(pos);
+        for (Literal l : prop.getLiterals()) {
+            if (!parent.canInsert(l)) {
+                throw new InvalidInferenceException("This diagram is not insertable to this place.");
+            }
+        }
+        parent.insertLiterals(pos, prop.getLiterals());
+    }
 }

@@ -254,7 +254,10 @@ public class Proposition {
      * @param pos the cursor proposition in terms of token index.
      * @param literals the list of literals to insert.
      */
-    public void insertLiterals(int pos, List<Literal> literals) {
+    public void insertLiterals(int pos, List<Literal> literals) throws InvalidSelectionException {
+        if (pos < 0) {
+            throw new InvalidSelectionException("Please place your cursor where white spaces are");
+        }
         if (cursorInShallow(pos)) {
             int index = 0;
             int pointer = -1;
@@ -280,6 +283,15 @@ public class Proposition {
 
     public boolean isSingleLiteralProp() {
         return literals.size() == 1;
+    }
+
+    public boolean canInsert(Literal literal) {
+        // Insertion
+        if (level % 2 == 1) {
+            return true;
+        }
+        // TODO: Iteration
+        return false;
     }
 
     @Override

@@ -122,8 +122,9 @@ public abstract class Literal {
      * Helps to insert a list of literals to where the cursor points at.
      * @param pos the cursor position in terms of token index.
      * @param literals the list of literals to insert.
+     * @throws InvalidSelectionException if the position is invalid.
      */
-    public void insertLiterals(int pos, List<Literal> literals) {
+    public void insertLiterals(int pos, List<Literal> literals) throws InvalidSelectionException {
     };
 
     public boolean canDelete() {
@@ -131,6 +132,7 @@ public abstract class Literal {
         if (parent.getLevel() % 2 == 0 && !parent.isSingleLiteralProp()) {
             return true;
         }
+        // TODO: Deiteration
         return false;
     };
 }

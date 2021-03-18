@@ -67,7 +67,7 @@ public class CutLiteral extends Literal {
     }
 
     @Override
-    public void insertLiterals(int pos, List<Literal> literals) {
+    public void insertLiterals(int pos, List<Literal> literals) throws InvalidSelectionException {
         content.insertLiterals(pos, literals);
     }
 
