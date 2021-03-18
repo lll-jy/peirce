@@ -45,6 +45,10 @@ public class Proposition {
         this.literals.add(literal);
     }
 
+    public int getLevel() {
+        return level;
+    }
+
     public CutLiteral getEnclosingLiteral() {
         return enclosingLiteral;
     }
@@ -206,11 +210,49 @@ public class Proposition {
         throw new InvalidSelectionException();
     }
 
+    public Proposition getCursorProp(int pos) {
+        if (cursorInShallow(pos)) {
+            return this;
+        } else {
+            for (Literal l : literals) {
+                if (l.cursorIn(pos)) {
+                    return l.getCursorProp(pos);
+                }
+            }
+        }
+        assert false;
+        return null;
+    }
+
     public void replaceLiterals(List<Literal> original, List<Literal> current) {
         assert literals.containsAll(original);
         int index = literals.indexOf(original.get(0));
         literals.removeAll(original);
         literals.addAll(index, current);
+    }
+
+    public void insertLiterals(int pos, List<Literal> literals) {
+        if (cursorInShallow(pos)) {
+            int index = 0;
+            int pointer = -1;
+            int len = this.literals.size();
+            while (index < len) {
+                int nextPointer = this.literals.get(index).getStartIndex();
+                if (pointer < pos && nextPointer >= pos) {
+                    break;
+                } else {
+                    index++;
+                    pointer = nextPointer;
+                }
+            }
+            this.literals.addAll(index, literals);
+        } else {
+            for (Literal l : this.literals) {
+                if (l.cursorIn(pos)) {
+                    l.insertLiterals(pos, literals);
+                }
+            }
+        }
     }
 
     @Override

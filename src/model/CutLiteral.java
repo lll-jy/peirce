@@ -62,6 +62,16 @@ public class CutLiteral extends Literal {
     }
 
     @Override
+    public Proposition getCursorProp(int pos) {
+        return content.getCursorProp(pos);
+    }
+
+    @Override
+    public void insertLiterals(int pos, List<Literal> literals) {
+        content.insertLiterals(pos, literals);
+    }
+
+    @Override
     public String toString() {
         return "[ " + content + "] ";
     }

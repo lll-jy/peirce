@@ -5,10 +5,12 @@ import logic.exceptions.InvalidSelectionException;
 import logic.exceptions.TheoremParseException;
 import logic.exceptions.VariableNameException;
 import logic.parser.Parser;
+import model.CutLiteral;
 import model.Literal;
 import model.Model;
 import model.Proposition;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -175,6 +177,31 @@ public class Logic {
         Literal original = literals.get(0);
         List<Literal> result = original.getAfterRemoveDoubleCut();
         // TODO: level change
-        original.getParent().replaceLiterals(literals, result);
+        getCursorProp(s).replaceLiterals(literals, result);
+    }
+
+    public Proposition getCursorProp(int pos) {
+        return getProposition().getCursorProp(pos);
+    }
+
+    public void addDoubleCut(int s, int e) throws InvalidSelectionException {
+        List<Literal> literals = getSelected(s, e);
+        Proposition parent = getCursorProp(s);
+        CutLiteral res = new CutLiteral(parent, null);
+        Proposition outer = new Proposition(parent.getLevel() + 1, res);
+        res.setContent(outer);
+        CutLiteral innerCut = new CutLiteral(outer, null);
+        outer.addLiteral(innerCut);
+        Proposition inner = new Proposition(parent.getLevel() + 2, innerCut);
+        innerCut.setContent(inner);
+        List<Literal> newLiterals = new ArrayList<>();
+        newLiterals.add(res);
+        if (literals.isEmpty()) {
+            parent.insertLiterals(s, newLiterals);
+        } else {
+            // TODO: level change
+            inner.addLiterals(literals);
+            parent.replaceLiterals(literals, newLiterals);
+        }
     }
 }

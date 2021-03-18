@@ -46,6 +46,12 @@ public class GroundLiteral extends Literal {
     }
 
     @Override
+    public Proposition getCursorProp(int pos) {
+        assert false;
+        return null;
+    }
+
+    @Override
     public String toString() {
         return variableName + " ";
     }

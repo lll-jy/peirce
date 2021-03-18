@@ -105,4 +105,9 @@ public abstract class Literal {
     abstract public List<Literal> getSelectedLiterals(int s, int e) throws InvalidSelectionException;
 
     abstract public List<Literal> getAfterRemoveDoubleCut() throws InvalidInferenceException;
+
+    abstract public Proposition getCursorProp(int pos);
+
+    public void insertLiterals(int pos, List<Literal> literals) {
+    };
 }

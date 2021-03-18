@@ -98,22 +98,26 @@ public class ProofPanel extends JPanel {
             try {
                 // resultDisplay.setText(theoremDisplay.getSelectedText() + "\n" +
                 // clipboard.getData(DataFlavor.stringFlavor));
-
-            } catch (Exception exception) {
-                resultDisplay.setText(exception.getMessage());
+                int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
+                int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
+                logic.addDoubleCut(start, end);
+                theoremDisplay.setText(logic.getProposition().toString());
+                resultDisplay.setText(String.format("Add double cut from %d to %d", start, end));
+            } catch (InvalidSelectionException err) {
+                resultDisplay.setText(err.getMessage());
             }
         });
         removeDoubleCutBtn.addActionListener(e -> {
             // resultDisplay.setText("" + logic.getTokenIndex(theoremDisplay.getCaretPosition()));
             // resultDisplay.setText(logic.getTokenIndex(theoremDisplay.getSelectionStart()) + "," + logic.getTokenIndex(theoremDisplay.getSelectionEnd()));
-            int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
-            int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
             try {
+                int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
+                int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
                 logic.removeDoubleCut(start, end);
                 theoremDisplay.setText(logic.getProposition().toString());
                 resultDisplay.setText(String.format("Double cut removed from %d to %d", start, end));
-            } catch (InvalidSelectionException | InvalidInferenceException ise) {
-                resultDisplay.setText(ise.getMessage());
+            } catch (InvalidSelectionException | InvalidInferenceException err) {
+                resultDisplay.setText(err.getMessage());
             }
         });
         add(resultPanel);
