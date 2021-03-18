@@ -18,6 +18,8 @@ import java.io.IOException;
 
 public class ProofPanel extends JPanel {
     private final Logic logic;
+    private final JPanel goalPanel;
+    private final JLabel goalDisplay;
     private final JPanel labelPanel;
     private final JPanel workPanel;
     private final JTextArea theoremDisplay;
@@ -34,9 +36,15 @@ public class ProofPanel extends JPanel {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
+        goalPanel = new JPanel();
+        goalDisplay = new JLabel(String.format("Goal: %s", logic.getTheorem()));
+        goalPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
+        goalPanel.add(goalDisplay);
+        add(goalPanel);
+
         labelPanel = new JPanel();
         labelPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
-        labelPanel.add(new JLabel("Current Goal:"));
+        labelPanel.add(new JLabel("Current Proposition:"));
         add(labelPanel);
 
         workPanel = new JPanel();
@@ -148,6 +156,7 @@ public class ProofPanel extends JPanel {
     public void refresh() {
         revalidate();
         repaint();
+        goalDisplay.setText(String.format("Goal: %s", logic.getTheorem()));
         theoremDisplay.setText(logic.getProposition().toString());
         resultDisplay.setText("");
     }

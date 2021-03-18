@@ -11,7 +11,7 @@ public class Model {
     private final List<String> variables;
     private final List<String> premisesStrings;
     private final List<Proposition> premises;
-    // private final Proposition theorem; TODO: set theorem
+    private Proposition theorem;
     private Proposition proposition;
 
     /**
@@ -21,6 +21,7 @@ public class Model {
         variables = new ArrayList<>();
         premisesStrings = new ArrayList<>();
         premises = new ArrayList<>();
+        theorem = new Proposition();
         proposition = new Proposition();
     }
 
@@ -41,7 +42,7 @@ public class Model {
     }
 
     /**
-     * Gets the proposition of the model.
+     * Gets the proposition currently in the the model.
      * @return the proposition.
      */
     public Proposition getProposition() {
@@ -49,11 +50,26 @@ public class Model {
     }
 
     /**
-     * Sets the proposition the a given new proposition.
-     * @param proposition the new proposition.
+     * Gets the theorem of the model.
+     * @return the theorem.
      */
-    public void setProposition(Proposition proposition) {
-        this.proposition = proposition;
+    public Proposition getTheorem() {
+        return theorem;
+    }
+
+    /**
+     * Sets the theorem to the given new proposition.
+     * @param theorem the new proposition.
+     */
+    public void setTheorem(Proposition theorem) {
+        this.theorem = theorem;
+        proposition = new Proposition();
+        for (Proposition premise : premises) {
+            for (Literal l : premise.getLiterals()) {
+                l.setParent(proposition);
+                proposition.addLiteral(l);
+            }
+        }
     }
 
     /**

@@ -96,7 +96,7 @@ public abstract class Parser {
      * @return the Proposition corresponding to the string.
      * @throws TheoremParseException if the string is not a valid Peirce diagram string.
      */
-    public static Proposition parseFrame(String peirce) throws TheoremParseException {
+    public Proposition parseFrame(String peirce) throws TheoremParseException {
         String[] peirceFrames = peirce.split(" ");
         if (peirceFrames[0].equals("!!ERROR")) {
             throw new TheoremParseException(INVALID_SYNTAX_ERR_MSG);
@@ -117,6 +117,9 @@ public abstract class Parser {
                 thisLiteral.setContent(proposition);
                 proposition = thisLiteral.getParent();
             } else {
+                if (!variables.contains(peirceFrames[i])) {
+                    throw new TheoremParseException(INVALID_TOKENS_ERR_MSG);
+                }
                 proposition.addLiteral(new GroundLiteral(proposition, peirceFrames[i]));
             }
         }

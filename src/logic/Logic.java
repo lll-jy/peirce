@@ -145,11 +145,19 @@ public class Logic {
     }
 
     /**
-     * Sets the proposition to be dealt with in this logic instance.
-     * @param proposition the new proposition.
+     * Sets the theorem to prove in this logic instance.
+     * @param theorem the new proposition.
      */
-    public void setProposition(Proposition proposition) {
-        model.setProposition(proposition);
+    public void setTheorem(Proposition theorem) {
+        model.setTheorem(theorem);
+    }
+
+    /**
+     * Gets the theorem of the logic instance.
+     * @return the theorem.
+     */
+    public Proposition getTheorem() {
+        return model.getTheorem();
     }
 
     /**
@@ -244,10 +252,12 @@ public class Logic {
         innerCut.setContent(inner);
         List<Literal> newLiterals = new ArrayList<>();
         newLiterals.add(res);
-        res.increaseLevelBy(2);
         if (literals.isEmpty()) {
             parent.insertLiterals(s, newLiterals);
         } else {
+            for (Literal l : literals) {
+                l.increaseLevelBy(2);
+            }
             inner.addLiterals(literals);
             parent.replaceLiterals(literals, newLiterals);
         }
@@ -281,7 +291,7 @@ public class Logic {
      */
     public void paste(int pos, String str) throws TheoremParseException,
             InvalidSelectionException, InvalidInferenceException {
-        Proposition prop = Parser.parseFrame(str);
+        Proposition prop = Parser.createParser(language, getVariables()).parseFrame(str);
         Proposition parent = getCursorProp(pos);
         for (Literal l : prop.getLiterals()) {
             if (!parent.canInsert(l)) {

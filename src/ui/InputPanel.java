@@ -9,7 +9,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -30,6 +29,7 @@ public class InputPanel extends JScrollPane {
     private final JTextField premiseInput;
     private final List<Card> premises;
     private final JPanel langSelectorPanel;
+    private final JPanel theoremHeader;
     private final JTextArea theoremInput;
     private final JPanel startProofBtnPanel;
     private final List<JButton> buttons;
@@ -87,6 +87,11 @@ public class InputPanel extends JScrollPane {
                     }
                 }, logic::getPremises, PremiseCard.class);
 
+        theoremHeader = new JPanel();
+        theoremHeader.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+        JLabel theoremLabel = new JLabel("Want to prove: ");
+        theoremHeader.add(theoremLabel);
+
         theoremInput = new JTextArea();
         theoremInput.setLineWrap(true);
         theoremInput.setMargin(new Insets(5, 5, 5, 5));
@@ -99,7 +104,7 @@ public class InputPanel extends JScrollPane {
             if (logic.canModifyDeclaration()) {
                 try {
                     Proposition result = logic.parse(theoremInput.getText());
-                    logic.setProposition(result);
+                    logic.setTheorem(result);
                     startProofBtn.setText(PROOF_TO_DECLARATION_BTN_MSG);
                     logic.setLanguage((String) langSelector.getSelectedItem());
                     for (JButton button : buttons) {
@@ -205,12 +210,13 @@ public class InputPanel extends JScrollPane {
         for (Card variableCard : variables) {
             panel.add(variableCard);
         }
+        panel.add(langSelectorPanel);
         panel.add(premiseHeader);
         panel.add(premiseInput);
         for (Card premiseCard : premises) {
             panel.add(premiseCard);
         }
-        panel.add(langSelectorPanel);
+        panel.add(theoremHeader);
         panel.add(theoremInput);
         panel.add(startProofBtnPanel);
     }

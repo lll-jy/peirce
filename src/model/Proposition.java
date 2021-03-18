@@ -299,7 +299,20 @@ public class Proposition {
             return true;
         }
         // Iteration
-        return appearsInFrame(literal);
+        return appearsInAncestors(literal);
+    }
+
+    public boolean appearsInAncestors(Literal literal) {
+        for (Literal l : literals) {
+            if (l.isSameLiteral(literal)) {
+                return true;
+            }
+        }
+        if (isBaseProp()) {
+            return false;
+        }
+        assert enclosingLiteral != null;
+        return enclosingLiteral.getParent().appearsInAncestors(literal);
     }
 
     /**
