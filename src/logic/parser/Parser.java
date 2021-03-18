@@ -86,7 +86,18 @@ public abstract class Parser {
         } catch (FileNotFoundException e) {
             assert false;
         }
-        String[] peirceFrames = sc.nextLine().split(" ");
+        String peirce = sc.nextLine();
+        return parseFrame(peirce);
+    }
+
+    /**
+     * Parses the string representing the frame to proposition.
+     * @param peirce the string to parse.
+     * @return the Proposition corresponding to the string.
+     * @throws TheoremParseException if the string is not a valid Peirce diagram string.
+     */
+    public static Proposition parseFrame(String peirce) throws TheoremParseException {
+        String[] peirceFrames = peirce.split(" ");
         if (peirceFrames[0].equals("!!ERROR")) {
             throw new TheoremParseException(INVALID_SYNTAX_ERR_MSG);
         }

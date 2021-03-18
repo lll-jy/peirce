@@ -9,7 +9,7 @@ import java.util.List;
  * Literals of a proposition connected by conjunction.
  */
 public abstract class Literal {
-    private final Proposition parent;
+    private Proposition parent;
 
     /**
      * Initializes a literal.
@@ -25,6 +25,14 @@ public abstract class Literal {
      */
     public Proposition getParent() {
         return parent;
+    }
+
+    /**
+     * Updates the parent of the literal.
+     * @param parent the parent proposition.
+     */
+    public void setParent(Proposition parent) {
+        this.parent = parent;
     }
 
     /**
@@ -136,7 +144,7 @@ public abstract class Literal {
         if (parent.getLevel() % 2 == 0 && !parent.isSingleLiteralProp()) {
             return true;
         }
-        // TODO: Deiteration
-        return false;
+        // Deiteration
+        return parent.appearsInAncestors(this);
     };
 }

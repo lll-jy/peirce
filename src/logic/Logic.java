@@ -251,11 +251,13 @@ public class Logic {
      */
     public void paste(int pos, String str) throws TheoremParseException,
             InvalidSelectionException, InvalidInferenceException {
-        Proposition prop = parse(str);
+        Proposition prop = Parser.parseFrame(str);
         Proposition parent = getCursorProp(pos);
         for (Literal l : prop.getLiterals()) {
             if (!parent.canInsert(l)) {
                 throw new InvalidInferenceException("This diagram is not insertable to this place.");
+            } else {
+                l.setParent(parent);
             }
         }
         // TODO: level change

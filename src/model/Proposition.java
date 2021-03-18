@@ -299,8 +299,21 @@ public class Proposition {
         if (level % 2 == 1) {
             return true;
         }
-        // TODO: Iteration
-        return false;
+        // Iteration
+        return appearsInAncestors(literal);
+    }
+
+    public boolean appearsInAncestors(Literal literal) {
+        for (Literal l : literals) {
+            if (l != literal && l.isSameLiteral(literal)) {
+                return true;
+            }
+        }
+        if (isBaseProp()) {
+            return false;
+        }
+        assert enclosingLiteral != null;
+        return enclosingLiteral.getParent().appearsInAncestors(literal);
     }
 
     @Override
