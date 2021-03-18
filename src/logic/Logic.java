@@ -178,6 +178,7 @@ public class Logic {
      */
     public void removeDoubleCut(int s, int e) throws InvalidSelectionException, InvalidInferenceException {
         List<Literal> literals = getSelected(s, e);
+        Proposition parent = getCursorProp(s);
         if (literals.size() != 1) {
             throw new InvalidInferenceException("Please select a single literal to remove double cuts.");
         }
@@ -185,8 +186,9 @@ public class Logic {
         List<Literal> result = original.getAfterRemoveDoubleCut();
         for (Literal l : result) {
             l.increaseLevelBy(-2);
+            l.setParent(parent);
         }
-        getCursorProp(s).replaceLiterals(literals, result);
+        parent.replaceLiterals(literals, result);
     }
 
     /**

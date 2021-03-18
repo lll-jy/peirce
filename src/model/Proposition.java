@@ -259,19 +259,18 @@ public class Proposition {
             throw new InvalidSelectionException("Please place your cursor where white spaces are");
         }
         if (cursorInShallow(pos)) {
-            int index = 0;
-            int pointer = -1;
             int len = this.literals.size();
-            while (index < len) {
-                int nextPointer = this.literals.get(index).getStartIndex();
-                if (pointer < pos && nextPointer >= pos) {
+            boolean inserted = false;
+            for (int i = 0; i < len; i++) {
+                if (this.literals.get(i).getStartIndex() == pos) {
+                    this.literals.addAll(i, literals);
+                    inserted = true;
                     break;
-                } else {
-                    index++;
-                    pointer = nextPointer;
                 }
             }
-            this.literals.addAll(index, literals);
+            if (!inserted) {
+                this.literals.addAll(literals);
+            }
         } else {
             for (Literal l : this.literals) {
                 if (l.cursorIn(pos)) {
@@ -300,25 +299,21 @@ public class Proposition {
             return true;
         }
         // Iteration
-        return appearsInAncestors(literal);
+        return appearsInFrame(literal);
     }
 
     /**
-     * Checks whether a literal of a given form appears in some frames enclosing this literal (but not itself).
+     * Checks whether a literal of a given form appears in some frames under this proposition.
      * @param literal the literal to find.
      * @return true if it appears.
      */
-    public boolean appearsInAncestors(Literal literal) {
+    public boolean appearsInFrame(Literal literal) {
         for (Literal l : literals) {
-            if (l != literal && l.isSameLiteral(literal)) {
+            if (l != literal && l.appearsInFrame(literal)) {
                 return true;
             }
         }
-        if (isBaseProp()) {
-            return false;
-        }
-        assert enclosingLiteral != null;
-        return enclosingLiteral.getParent().appearsInAncestors(literal);
+        return false;
     }
 
     /**

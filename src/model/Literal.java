@@ -145,8 +145,15 @@ public abstract class Literal {
             return true;
         }
         // Deiteration
-        return parent.appearsInAncestors(this);
+        return parent.appearsInFrame(this);
     };
+
+    /**
+     * Helps to check whether a literal of a given form appears in some frames under a proposition.
+     * @param literal the literal to find.
+     * @return true if it appears.
+     */
+    abstract public boolean appearsInFrame(Literal literal);
 
     /**
      * Increases the level of the literal and its enclosing content.

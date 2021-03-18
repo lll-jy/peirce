@@ -77,6 +77,11 @@ public class CutLiteral extends Literal {
     }
 
     @Override
+    public boolean appearsInFrame(Literal literal) {
+        return isSameLiteral(literal) || content.appearsInFrame(literal);
+    }
+
+    @Override
     public String toString() {
         return "[ " + content + "] ";
     }
