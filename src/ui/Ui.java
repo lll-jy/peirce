@@ -1,11 +1,9 @@
 package ui;
 
 import logic.Logic;
-import model.Proposition;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.function.Consumer;
 
 /**
  * The UI component of the application.

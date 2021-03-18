@@ -55,21 +55,51 @@ public abstract class Literal {
      */
     abstract public int getLength();
 
+    /**
+     * Checks whether this literal covers the selected part, excluding the brackets for cut.
+     * @param s the start token index of selected part.
+     * @param e the end token index of selected part (exclusive).
+     * @return true if the literal is a cut literal and the selected part are completely in the bracket of the cut.
+     */
     public boolean covers(int s, int e) {
         return s > getStartIndex() && e < getLastIndex();
     }
 
+    /**
+     * Checks whether this literal is completely covered by the selected part.
+     * @param s the start token index of selected part.
+     * @param e the end token index of selected part (exclusive).
+     * @return true if the literal, including its brackets for cut, is completely covered by the selected part.
+     */
     public boolean isCoveredBy(int s, int e) {
         return s <= getStartIndex() && e >= getLastIndex();
     }
 
+    /**
+     * Checks whether the cursor is in the brackets for cut of this literal.
+     * @param pos the position of cursor in terms of token index.
+     * @return true if the literal is a cut literal and the cursor is in the brackets of the cut.
+     */
     public boolean cursorIn(int pos) {
         return pos > getStartIndex() && pos < getLastIndex();
     }
 
+    /**
+     * Checks whether this literal is selected.
+     * @param s the start token index of the selected part.
+     * @param e the end token index of the selected part.
+     * @return true if this literal is selected and no enclosing cut is selected.
+     */
     public boolean isSelected(int s, int e) {
         return isCoveredBy(s, e) && (parent.cursorInShallow(s) && parent.cursorInShallow(e));
     }
 
+    /**
+     * Gets the list of selected literals inside this literal
+     * @param s the start token index of the selected part.
+     * @param e the end token index of the selected part.
+     * @return the list of selected literals, excluding those enclosed by other selected literals.
+     * @throws InvalidSelectionException if the selected part is invalid.
+     */
     abstract public List<Literal> getSelectedLiterals(int s, int e) throws InvalidSelectionException;
 }

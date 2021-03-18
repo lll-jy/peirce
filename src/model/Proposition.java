@@ -153,10 +153,20 @@ public class Proposition {
         return s >= getStartIndex() && e <= getLastIndex();
     }
 
+    /**
+     * Checks whether the cursor position is in this proposition.
+     * @param pos the cursor position in terms of token index.
+     * @return true if the cursor is in this proposition.
+     */
     public boolean cursorIn(int pos) {
         return pos >= getStartIndex() && pos <= getLastIndex();
     }
 
+    /**
+     * Checks whether the cursor position is in this proposition but not any children of it.
+     * @param pos the cursor position in terms of token index.
+     * @return true if the cursor is in this proposition but not in any children of this proposition.
+     */
     public boolean cursorInShallow(int pos) {
         if (!cursorIn(pos)) {
             return false;
@@ -170,6 +180,13 @@ public class Proposition {
         }
     }
 
+    /**
+     * Gets the list of selected literals.
+     * @param s the start token index selected.
+     * @param e the end token index selected (exclusive).
+     * @return the list of selected literals, excluding those enclosed in some selected literals.
+     * @throws InvalidSelectionException if the selected part is not valid.
+     */
     public List<Literal> getSelectedLiterals(int s, int e) throws InvalidSelectionException {
         if (cursorInShallow(s) && cursorInShallow(e)) {
             List<Literal> selected = new ArrayList<>();

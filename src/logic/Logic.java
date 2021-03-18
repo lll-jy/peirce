@@ -151,7 +151,18 @@ public class Logic {
         return -1;
     }
 
+    /**
+     * Gets the list of selected literals.
+     * @param s the start token index selected.
+     * @param e the end token index selected (exclusive).
+     * @return the list of literals contained in the range of [s,e) but no enclosing frames are within the range.
+     * @throws InvalidSelectionException if the selected part is invalid.
+     */
     public List<Literal> getSelected(int s, int e) throws InvalidSelectionException {
+        if (s < 0 || e < 0) {
+            throw new InvalidSelectionException("Some literals are selected but " +
+                    "not selected completely. Please select again");
+        }
         return getProposition().getSelectedLiterals(s, e);
     }
 }
