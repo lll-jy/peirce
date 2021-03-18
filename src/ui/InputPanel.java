@@ -3,12 +3,13 @@ package ui;
 import logic.Logic;
 import logic.exceptions.TheoremParseException;
 import logic.exceptions.VariableNameException;
-import logic.parser.Parser;
+import model.Proposition;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * The panel that handles variable and theorem declaration.
@@ -92,8 +93,8 @@ public class InputPanel extends JScrollPane {
             if (logic.canModifyDeclaration()) {
                 try {
                     // TODO
-                    Object result = Parser.createParser(logic.getLanguage(), logic.getVariables())
-                            .parse(theoremInput.getText());
+                    Proposition result = logic.parse(theoremInput.getText());
+                    logic.setProposition(result);
                     startProofBtn.setText(PROOF_TO_DECLARATION_BTN_MSG);
                     logic.setLanguage((String) langSelector.getSelectedItem());
                     for (JButton button : buttons) {
@@ -105,10 +106,7 @@ public class InputPanel extends JScrollPane {
                     for (VariableCard card : variables) {
                         card.switchEditable();
                     }
-                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
-                            result + "\n" + logic.getLanguage(),
-                            "", JOptionPane.WARNING_MESSAGE
-                    );
+                    refreshParent.run();
                 } catch (TheoremParseException tpe) {
                     JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
                             tpe.getMessage(),

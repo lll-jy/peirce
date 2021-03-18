@@ -1,7 +1,10 @@
 package logic;
 
+import logic.exceptions.TheoremParseException;
 import logic.exceptions.VariableNameException;
+import logic.parser.Parser;
 import model.Model;
+import model.Proposition;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -16,6 +19,7 @@ public class Logic {
     private final Model model;
     private Language language;
     private Mode mode;
+    private Proposition proposition;
 
     /**
      * Initializes a Logic component based on the model, and initially the default language is Coq, and
@@ -26,6 +30,7 @@ public class Logic {
         this.model = model;
         this.language = Language.Coq;
         this.mode = Mode.DECLARATION;
+        this.proposition = new Proposition();
     }
 
     /**
@@ -106,5 +111,31 @@ public class Logic {
             case "Coq" -> this.language = Language.Coq;
             case "LaTeX" -> this.language = Language.LaTeX;
         }
+    }
+
+    /**
+     * Parses a string of theorem to a proposition structure.
+     * @param theorem the string of the theorem.
+     * @return the Proposition corresponding to the theorem constructed.
+     * @throws TheoremParseException if the input theorem is invalid.
+     */
+    public Proposition parse(String theorem) throws TheoremParseException {
+        return Parser.createParser(getLanguage(), getVariables()).parse(theorem);
+    }
+
+    /**
+     * Sets the proposition to be dealt with in this logic instance.
+     * @param proposition the new proposition.
+     */
+    public void setProposition(Proposition proposition) {
+        this.proposition = proposition;
+    }
+
+    /**
+     * Gets the current proposition.
+     * @return the proposition.
+     */
+    public Proposition getProposition() {
+        return proposition;
     }
 }

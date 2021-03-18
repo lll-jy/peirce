@@ -84,6 +84,7 @@ get_structure(S):-
   read_file("LeTeX",Tokens), latex_prop(S,Tokens,[]).
 
 execute:-
+  open("prolog/peirce.txt",write,O), write(O,"!!ERROR"), close(O),
   get_structure(S), functor_to_peirce(S,L), write_file(L).
 
 :-execute.

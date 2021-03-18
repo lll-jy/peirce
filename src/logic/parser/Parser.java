@@ -87,6 +87,9 @@ public abstract class Parser {
             assert false;
         }
         String[] peirceFrames = sc.nextLine().split(" ");
+        if (peirceFrames[0].equals("!!ERROR")) {
+            throw new TheoremParseException(INVALID_SYNTAX_ERR_MSG);
+        }
         int level = 0;
         Proposition proposition = new Proposition();
         Stack<CutLiteral> stack = new Stack<>();

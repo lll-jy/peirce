@@ -1,9 +1,11 @@
 package ui;
 
 import logic.Logic;
+import model.Proposition;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.function.Consumer;
 
 /**
  * The UI component of the application.
@@ -27,17 +29,20 @@ public class Ui {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Panel setup
+        ProofPanel proofPanel = new ProofPanel(logic);
         JPanel panel = new JPanel();
         JMenuBar menuBar = new MenuBar();
-        JScrollPane inputPanel = new InputPanel(logic, () -> {
+        JScrollPane inputPanel = new InputPanel(logic,  () -> {
             panel.revalidate();
             panel.repaint();
+            proofPanel.refresh();
         });
 
-        JPanel proofPanel = new JPanel();
-        proofPanel.add(new JLabel("test 2"));
-        panel.add(proofPanel);
+        //JPanel proofPanel = new JPanel();
+        //proofPanel.add(new JLabel("test 2"));
+        //panel.add(proofPanel);
         // TODO
+        panel.add(proofPanel);
 
         // Frame building
         frame.setVisible(true);
