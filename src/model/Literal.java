@@ -1,5 +1,6 @@
 package model;
 
+import logic.exceptions.InvalidInferenceException;
 import logic.exceptions.InvalidSelectionException;
 
 import java.util.List;
@@ -102,4 +103,6 @@ public abstract class Literal {
      * @throws InvalidSelectionException if the selected part is invalid.
      */
     abstract public List<Literal> getSelectedLiterals(int s, int e) throws InvalidSelectionException;
+
+    abstract public List<Literal> getAfterRemoveDoubleCut() throws InvalidInferenceException;
 }

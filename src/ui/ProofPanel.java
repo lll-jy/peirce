@@ -1,6 +1,7 @@
 package ui;
 
 import logic.Logic;
+import logic.exceptions.InvalidInferenceException;
 import logic.exceptions.InvalidSelectionException;
 
 import javax.swing.*;
@@ -59,7 +60,7 @@ public class ProofPanel extends JPanel {
             public void keyTyped(KeyEvent e) {
             }
 
-            // TODO
+            // TODO: cut and paste
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_X && e.isControlDown()) {
@@ -92,11 +93,12 @@ public class ProofPanel extends JPanel {
         resultPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
         resultDisplay = new JLabel();
         resultPanel.add(resultDisplay);
-        // TODO
+        // TODO: add double cut
         addDoubleCutBtn.addActionListener(e -> {
             try {
-                resultDisplay.setText(theoremDisplay.getSelectedText() + "\n" +
-                        clipboard.getData(DataFlavor.stringFlavor));
+                // resultDisplay.setText(theoremDisplay.getSelectedText() + "\n" +
+                // clipboard.getData(DataFlavor.stringFlavor));
+
             } catch (Exception exception) {
                 resultDisplay.setText(exception.getMessage());
             }
@@ -107,8 +109,10 @@ public class ProofPanel extends JPanel {
             int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
             int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
             try {
-                resultDisplay.setText(logic.getSelected(start, end).toString());
-            } catch (InvalidSelectionException ise) {
+                logic.removeDoubleCut(start, end);
+                theoremDisplay.setText(logic.getProposition().toString());
+                resultDisplay.setText(String.format("Double cut removed from %d to %d", start, end));
+            } catch (InvalidSelectionException | InvalidInferenceException ise) {
                 resultDisplay.setText(ise.getMessage());
             }
         });

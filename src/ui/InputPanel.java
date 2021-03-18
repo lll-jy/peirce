@@ -92,7 +92,6 @@ public class InputPanel extends JScrollPane {
         startProofBtn.addActionListener(e -> {
             if (logic.canModifyDeclaration()) {
                 try {
-                    // TODO
                     Proposition result = logic.parse(theoremInput.getText());
                     logic.setProposition(result);
                     startProofBtn.setText(PROOF_TO_DECLARATION_BTN_MSG);

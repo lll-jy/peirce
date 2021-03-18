@@ -206,6 +206,13 @@ public class Proposition {
         throw new InvalidSelectionException();
     }
 
+    public void replaceLiterals(List<Literal> original, List<Literal> current) {
+        assert literals.containsAll(original);
+        int index = literals.indexOf(original.get(0));
+        literals.removeAll(original);
+        literals.addAll(index, current);
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

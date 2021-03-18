@@ -1,5 +1,6 @@
 package model;
 
+import logic.exceptions.InvalidInferenceException;
 import logic.exceptions.InvalidSelectionException;
 
 import java.util.List;
@@ -45,6 +46,19 @@ public class CutLiteral extends Literal {
     @Override
     public List<Literal> getSelectedLiterals(int s, int e) throws InvalidSelectionException {
         return content.getSelectedLiterals(s, e);
+    }
+
+    @Override
+    public List<Literal> getAfterRemoveDoubleCut() throws InvalidInferenceException {
+        List<Literal> literals = content.getLiterals();
+        if (literals.size() != 1) {
+            throw new InvalidInferenceException("This is not a double cut structure.");
+        }
+        Literal literal = literals.get(0);
+        if (literal instanceof CutLiteral) {
+            return ((CutLiteral) literal).content.getLiterals();
+        }
+        throw new InvalidInferenceException("This is not a double cut structure.");
     }
 
     @Override

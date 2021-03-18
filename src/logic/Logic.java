@@ -1,5 +1,6 @@
 package logic;
 
+import logic.exceptions.InvalidInferenceException;
 import logic.exceptions.InvalidSelectionException;
 import logic.exceptions.TheoremParseException;
 import logic.exceptions.VariableNameException;
@@ -164,5 +165,16 @@ public class Logic {
                     "not selected completely. Please select again");
         }
         return getProposition().getSelectedLiterals(s, e);
+    }
+
+    public void removeDoubleCut(int s, int e) throws InvalidSelectionException, InvalidInferenceException {
+        List<Literal> literals = getSelected(s, e);
+        if (literals.size() != 1) {
+            throw new InvalidInferenceException("Please select a single literal to remove double cuts.");
+        }
+        Literal original = literals.get(0);
+        List<Literal> result = original.getAfterRemoveDoubleCut();
+        // TODO: level change
+        original.getParent().replaceLiterals(literals, result);
     }
 }

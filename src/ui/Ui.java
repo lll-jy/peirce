@@ -39,7 +39,7 @@ public class Ui {
         //JPanel proofPanel = new JPanel();
         //proofPanel.add(new JLabel("test 2"));
         //panel.add(proofPanel);
-        // TODO
+        // TODO: other UI components
         panel.add(proofPanel);
 
         // Frame building

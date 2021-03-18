@@ -1,5 +1,6 @@
 package model;
 
+import logic.exceptions.InvalidInferenceException;
 import logic.exceptions.InvalidSelectionException;
 
 import java.util.List;
@@ -37,6 +38,11 @@ public class GroundLiteral extends Literal {
     @Override
     public List<Literal> getSelectedLiterals(int s, int e) throws InvalidSelectionException {
         throw new InvalidSelectionException();
+    }
+
+    @Override
+    public List<Literal> getAfterRemoveDoubleCut() throws InvalidInferenceException {
+        throw new InvalidInferenceException("This literal chosen is not a double cut.");
     }
 
     @Override
