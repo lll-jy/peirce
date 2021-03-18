@@ -21,7 +21,6 @@ public class Logic {
     private final Model model;
     private Language language;
     private Mode mode;
-    private Proposition proposition;
 
     /**
      * Initializes a Logic component based on the model, and initially the default language is Coq, and
@@ -32,15 +31,6 @@ public class Logic {
         this.model = model;
         this.language = Language.Coq;
         this.mode = Mode.DECLARATION;
-        this.proposition = new Proposition();
-    }
-
-    /**
-     * Gets the model of the application.
-     * @return the model of the application.
-     */
-    public Model getModel() {
-        return model;
     }
 
     /**
@@ -130,7 +120,7 @@ public class Logic {
      * @param proposition the new proposition.
      */
     public void setProposition(Proposition proposition) {
-        this.proposition = proposition;
+        model.setProposition(proposition);
     }
 
     /**
@@ -138,7 +128,7 @@ public class Logic {
      * @return the proposition.
      */
     public Proposition getProposition() {
-        return proposition;
+        return model.getProposition();
     }
 
     /**
@@ -151,7 +141,7 @@ public class Logic {
         if (cursorPos == 0) {
             return 0;
         }
-        String theorem = proposition.toString();
+        String theorem = getProposition().toString();
         if (cursorPos == theorem.length()) {
             return theorem.split(" ").length;
         }
@@ -162,6 +152,6 @@ public class Logic {
     }
 
     public List<Literal> getSelected(int s, int e) throws InvalidSelectionException {
-        return proposition.getSelectedLiterals(s, e);
+        return getProposition().getSelectedLiterals(s, e);
     }
 }

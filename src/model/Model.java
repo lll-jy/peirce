@@ -9,12 +9,14 @@ import java.util.List;
  */
 public class Model {
     private final List<String> variables;
+    private Proposition proposition;
 
     /**
      * Initializes a model component with empty variables, theorem, and history.
      */
     public Model() {
         variables = new ArrayList<>();
+        proposition = new Proposition();
     }
 
     /**
@@ -23,6 +25,22 @@ public class Model {
      */
     public List<String> getVariables() {
         return variables;
+    }
+
+    /**
+     * Gets the proposition of the model.
+     * @return the proposition.
+     */
+    public Proposition getProposition() {
+        return proposition;
+    }
+
+    /**
+     * Sets the proposition the a given new proposition.
+     * @param proposition the new proposition.
+     */
+    public void setProposition(Proposition proposition) {
+        this.proposition = proposition;
     }
 
     /**
