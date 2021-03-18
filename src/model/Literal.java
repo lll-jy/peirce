@@ -104,10 +104,25 @@ public abstract class Literal {
      */
     abstract public List<Literal> getSelectedLiterals(int s, int e) throws InvalidSelectionException;
 
+    /**
+     * Gets the list of literals after removing outer double cut of this literal.
+     * @return the literals inside the outer double cut of this literal.
+     * @throws InvalidInferenceException if the literal is not in the form of double cut.
+     */
     abstract public List<Literal> getAfterRemoveDoubleCut() throws InvalidInferenceException;
 
+    /**
+     * Helps to get the proposition where the cursor is in but not in any of its children.
+     * @param pos the cursor position in terms of token index.
+     * @return the proposition where the cursor is in.
+     */
     abstract public Proposition getCursorProp(int pos);
 
+    /**
+     * Helps to insert a list of literals to where the cursor points at.
+     * @param pos the cursor position in terms of token index.
+     * @param literals the list of literals to insert.
+     */
     public void insertLiterals(int pos, List<Literal> literals) {
     };
 }

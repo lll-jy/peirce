@@ -33,6 +33,10 @@ public class Proposition {
         literals = new ArrayList<>();
     }
 
+    /**
+     * Adds a list of literals to the proposition.
+     * @param literals the list of literals to add.
+     */
     public void addLiterals(List<Literal> literals) {
         this.literals.addAll(literals);
     }
@@ -45,6 +49,10 @@ public class Proposition {
         this.literals.add(literal);
     }
 
+    /**
+     * Gets the level of this proposition.
+     * @return the level of the proposition.
+     */
     public int getLevel() {
         return level;
     }
@@ -210,6 +218,11 @@ public class Proposition {
         throw new InvalidSelectionException();
     }
 
+    /**
+     * Gets the proposition where the cursor is in but not in any of its children.
+     * @param pos cursor position in terms of token index.
+     * @return the unique proposition for which {@code cursorInShallow(pos)} returns true.
+     */
     public Proposition getCursorProp(int pos) {
         if (cursorInShallow(pos)) {
             return this;
@@ -224,6 +237,11 @@ public class Proposition {
         return null;
     }
 
+    /**
+     * Replaces the list of literals in the proposition with a new list of literals in the corresponding place.
+     * @param original the literals to remove.
+     * @param current the literals to add in place of the removed ones.
+     */
     public void replaceLiterals(List<Literal> original, List<Literal> current) {
         assert literals.containsAll(original);
         int index = literals.indexOf(original.get(0));
@@ -231,6 +249,11 @@ public class Proposition {
         literals.addAll(index, current);
     }
 
+    /**
+     * Inserts a list of literals in the proposition where the cursor points to.
+     * @param pos the cursor proposition in terms of token index.
+     * @param literals the list of literals to insert.
+     */
     public void insertLiterals(int pos, List<Literal> literals) {
         if (cursorInShallow(pos)) {
             int index = 0;

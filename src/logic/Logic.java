@@ -169,6 +169,13 @@ public class Logic {
         return getProposition().getSelectedLiterals(s, e);
     }
 
+    /**
+     * Removes double cut in the selected part if it is in the form "[ [ proposition ] ]".
+     * @param s the start token index selected.
+     * @param e the end token index selected (exclusive).
+     * @throws InvalidSelectionException if the selected part is not a valid proposition.
+     * @throws InvalidInferenceException if the selected part is not in the form "[ [ proposition ] ]".
+     */
     public void removeDoubleCut(int s, int e) throws InvalidSelectionException, InvalidInferenceException {
         List<Literal> literals = getSelected(s, e);
         if (literals.size() != 1) {
@@ -180,10 +187,21 @@ public class Logic {
         getCursorProp(s).replaceLiterals(literals, result);
     }
 
+    /**
+     * Gets the proposition that is the inner most environment the cursor is in.
+     * @param pos the cursor position in terms of token index.
+     * @return the inner most enclosing proposition of the cursor.
+     */
     public Proposition getCursorProp(int pos) {
         return getProposition().getCursorProp(pos);
     }
 
+    /**
+     * Adds a double cut surrounding the selected part.
+     * @param s the start index of the selected part.
+     * @param e the end index of the selected part (exclusive).
+     * @throws InvalidSelectionException if the selected part is not a valid proposition.
+     */
     public void addDoubleCut(int s, int e) throws InvalidSelectionException {
         List<Literal> literals = getSelected(s, e);
         Proposition parent = getCursorProp(s);
