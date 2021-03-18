@@ -1,5 +1,9 @@
 package model;
 
+import logic.exceptions.InvalidSelectionException;
+
+import java.util.List;
+
 /**
  * Cut form propositions as a literal.
  */
@@ -36,6 +40,11 @@ public class CutLiteral extends Literal {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public List<Literal> getSelectedLiterals(int s, int e) throws InvalidSelectionException {
+        return content.getSelectedLiterals(s, e);
     }
 
     @Override

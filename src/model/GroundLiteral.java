@@ -1,5 +1,9 @@
 package model;
 
+import logic.exceptions.InvalidSelectionException;
+
+import java.util.List;
+
 /**
  * Literals that constitutes only one variable.
  */
@@ -28,6 +32,11 @@ public class GroundLiteral extends Literal {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public List<Literal> getSelectedLiterals(int s, int e) throws InvalidSelectionException {
+        throw new InvalidSelectionException();
     }
 
     @Override

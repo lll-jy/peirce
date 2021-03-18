@@ -1,5 +1,7 @@
 package model;
 
+import logic.exceptions.InvalidSelectionException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,8 +97,22 @@ public class Proposition {
      * @param l the literal to locate.
      * @return the index of the literal.
      */
-    public int getIndexOf(Literal l) {
+    private int getIndexOf(Literal l) {
         return literals.indexOf(l);
+    }
+
+    /**
+     * Gets accumulative length before a given literal in the proposition.
+     * @param l the literal as end delimit.
+     * @return the length before the given literal.
+     */
+    public int getLengthBefore(Literal l) {
+        int index = getIndexOf(l);
+        int acc = 0;
+        for (int i = 0; i < index; i++) {
+            acc += literals.get(i).getLength();
+        }
+        return acc;
     }
 
     /**
@@ -121,12 +137,56 @@ public class Proposition {
         return getStartIndex() + getLength();
     }
 
+    /**
+     * Gets the number of tokens of this proposition, including variable names and brackets.
+     * @return the number of tokens.
+     */
     public int getLength() {
         int count = 0;
         for (Literal l : literals) {
             count += l.getLength();
         }
         return count;
+    }
+
+    public boolean covers(int s, int e) {
+        return s >= getStartIndex() && e <= getLastIndex();
+    }
+
+    public boolean cursorIn(int pos) {
+        return pos >= getStartIndex() && pos <= getLastIndex();
+    }
+
+    public boolean cursorInShallow(int pos) {
+        if (!cursorIn(pos)) {
+            return false;
+        } else {
+            for (Literal l : literals) {
+                if (l.cursorIn(pos)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    public List<Literal> getSelectedLiterals(int s, int e) throws InvalidSelectionException {
+        if (cursorInShallow(s) && cursorInShallow(e)) {
+            List<Literal> selected = new ArrayList<>();
+            for (Literal l : literals) {
+                if (l.isSelected(s, e)) {
+                    selected.add(l);
+                }
+            }
+            return selected;
+        } else if (!(cursorInShallow(s) || cursorInShallow(e))) {
+            for (Literal l : literals) {
+                if (l.covers(s, e)) {
+                    return l.getSelectedLiterals(s, e);
+                }
+            }
+        }
+        throw new InvalidSelectionException();
     }
 
     @Override

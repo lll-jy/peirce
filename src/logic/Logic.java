@@ -1,8 +1,10 @@
 package logic;
 
+import logic.exceptions.InvalidSelectionException;
 import logic.exceptions.TheoremParseException;
 import logic.exceptions.VariableNameException;
 import logic.parser.Parser;
+import model.Literal;
 import model.Model;
 import model.Proposition;
 
@@ -157,5 +159,9 @@ public class Logic {
             return theorem.substring(0, cursorPos).split(" ").length;
         }
         return -1;
+    }
+
+    public List<Literal> getSelected(int s, int e) throws InvalidSelectionException {
+        return proposition.getSelectedLiterals(s, e);
     }
 }

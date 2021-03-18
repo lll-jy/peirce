@@ -1,5 +1,9 @@
 package model;
 
+import logic.exceptions.InvalidSelectionException;
+
+import java.util.List;
+
 /**
  * Literals of a proposition connected by conjunction.
  */
@@ -34,9 +38,7 @@ public abstract class Literal {
      * @return the token index of the first token of this literal.
      */
     public int getStartIndex() {
-        int base = parent.getStartIndex();
-        int index = parent.getIndexOf(this);
-        return base + index;
+        return parent.getStartIndex() + parent.getLengthBefore(this);
     }
 
     /**
@@ -52,4 +54,22 @@ public abstract class Literal {
      * @return the length of the literal.
      */
     abstract public int getLength();
+
+    public boolean covers(int s, int e) {
+        return s > getStartIndex() && e < getLastIndex();
+    }
+
+    public boolean isCoveredBy(int s, int e) {
+        return s <= getStartIndex() && e >= getLastIndex();
+    }
+
+    public boolean cursorIn(int pos) {
+        return pos > getStartIndex() && pos < getLastIndex();
+    }
+
+    public boolean isSelected(int s, int e) {
+        return isCoveredBy(s, e) && (parent.cursorInShallow(s) && parent.cursorInShallow(e));
+    }
+
+    abstract public List<Literal> getSelectedLiterals(int s, int e) throws InvalidSelectionException;
 }

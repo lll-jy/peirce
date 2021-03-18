@@ -1,6 +1,7 @@
 package ui;
 
 import logic.Logic;
+import logic.exceptions.InvalidSelectionException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -101,7 +102,15 @@ public class ProofPanel extends JPanel {
             }
         });
         removeDoubleCutBtn.addActionListener(e -> {
-            resultDisplay.setText("" + logic.getTokenIndex(theoremDisplay.getCaretPosition()));
+            // resultDisplay.setText("" + logic.getTokenIndex(theoremDisplay.getCaretPosition()));
+            // resultDisplay.setText(logic.getTokenIndex(theoremDisplay.getSelectionStart()) + "," + logic.getTokenIndex(theoremDisplay.getSelectionEnd()));
+            int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
+            int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
+            try {
+                resultDisplay.setText(logic.getSelected(start, end).toString());
+            } catch (InvalidSelectionException ise) {
+                resultDisplay.setText(ise.getMessage());
+            }
         });
         add(resultPanel);
     }
