@@ -125,4 +125,12 @@ public abstract class Literal {
      */
     public void insertLiterals(int pos, List<Literal> literals) {
     };
+
+    public boolean canDelete() {
+        // Erasure
+        if (parent.getLevel() % 2 == 0 && !parent.isSingleLiteralProp()) {
+            return true;
+        }
+        return false;
+    };
 }

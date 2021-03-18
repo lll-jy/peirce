@@ -222,4 +222,15 @@ public class Logic {
             parent.replaceLiterals(literals, newLiterals);
         }
     }
+
+    public void cut(int s, int e) throws InvalidSelectionException, InvalidInferenceException {
+        List<Literal> literals = getSelected(s, e);
+        Proposition parent = getCursorProp(s);
+        for (Literal l : literals) {
+            if (!l.canDelete()) {
+                throw new InvalidInferenceException("Some literals selected cannot be removed.");
+            }
+        }
+        parent.replaceLiterals(literals, new ArrayList<>());
+    }
 }

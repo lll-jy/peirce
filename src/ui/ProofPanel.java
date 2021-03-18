@@ -64,7 +64,15 @@ public class ProofPanel extends JPanel {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_X && e.isControlDown()) {
-                    resultDisplay.setText("cut");
+                    try {
+                        int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
+                        int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
+                        logic.cut(start, end);
+                        theoremDisplay.setText(logic.getProposition().toString());
+                        resultDisplay.setText(String.format("%d to %d removed", start, end));
+                    } catch (InvalidSelectionException | InvalidInferenceException err) {
+                        resultDisplay.setText(err.getMessage());
+                    }
                 } else if (e.getKeyCode() == KeyEvent.VK_V && e.isControlDown()) {
                     resultDisplay.setText("paste");
                 }
@@ -93,7 +101,6 @@ public class ProofPanel extends JPanel {
         resultPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
         resultDisplay = new JLabel();
         resultPanel.add(resultDisplay);
-        // TODO: add double cut
         addDoubleCutBtn.addActionListener(e -> {
             try {
                 // resultDisplay.setText(theoremDisplay.getSelectedText() + "\n" +

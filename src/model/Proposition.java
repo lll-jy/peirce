@@ -278,6 +278,10 @@ public class Proposition {
         }
     }
 
+    public boolean isSingleLiteralProp() {
+        return literals.size() == 1;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
