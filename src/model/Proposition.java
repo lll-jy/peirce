@@ -9,7 +9,7 @@ import java.util.List;
  * Propositions data structure.
  */
 public class Proposition {
-    private final int level;
+    private int level;
     private final CutLiteral enclosingLiteral;
     private final List<Literal> literals;
 
@@ -303,6 +303,11 @@ public class Proposition {
         return appearsInAncestors(literal);
     }
 
+    /**
+     * Checks whether a literal of a given form appears in some frames enclosing this literal (but not itself).
+     * @param literal the literal to find.
+     * @return true if it appears.
+     */
     public boolean appearsInAncestors(Literal literal) {
         for (Literal l : literals) {
             if (l != literal && l.isSameLiteral(literal)) {
@@ -314,6 +319,17 @@ public class Proposition {
         }
         assert enclosingLiteral != null;
         return enclosingLiteral.getParent().appearsInAncestors(literal);
+    }
+
+    /**
+     * Increases the level of the proposition.
+     * @param inc the amount to increase.
+     */
+    public void increaseLevelBy(int inc) {
+        level += inc;
+        for (Literal l : literals) {
+            l.increaseLevelBy(inc);
+        }
     }
 
     @Override

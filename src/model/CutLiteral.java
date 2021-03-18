@@ -72,6 +72,11 @@ public class CutLiteral extends Literal {
     }
 
     @Override
+    public void increaseLevelBy(int inc) {
+        content.increaseLevelBy(inc);
+    }
+
+    @Override
     public String toString() {
         return "[ " + content + "] ";
     }

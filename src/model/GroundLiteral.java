@@ -52,6 +52,10 @@ public class GroundLiteral extends Literal {
     }
 
     @Override
+    public void increaseLevelBy(int inc) {
+    }
+
+    @Override
     public String toString() {
         return variableName + " ";
     }

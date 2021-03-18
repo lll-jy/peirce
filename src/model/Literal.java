@@ -147,4 +147,10 @@ public abstract class Literal {
         // Deiteration
         return parent.appearsInAncestors(this);
     };
+
+    /**
+     * Increases the level of the literal and its enclosing content.
+     * @param inc the number of levels to increase.
+     */
+    abstract public void increaseLevelBy(int inc);
 }

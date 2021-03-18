@@ -183,7 +183,9 @@ public class Logic {
         }
         Literal original = literals.get(0);
         List<Literal> result = original.getAfterRemoveDoubleCut();
-        // TODO: level change
+        for (Literal l : result) {
+            l.increaseLevelBy(-2);
+        }
         getCursorProp(s).replaceLiterals(literals, result);
     }
 
@@ -214,10 +216,10 @@ public class Logic {
         innerCut.setContent(inner);
         List<Literal> newLiterals = new ArrayList<>();
         newLiterals.add(res);
+        res.increaseLevelBy(2);
         if (literals.isEmpty()) {
             parent.insertLiterals(s, newLiterals);
         } else {
-            // TODO: level change
             inner.addLiterals(literals);
             parent.replaceLiterals(literals, newLiterals);
         }
@@ -260,7 +262,7 @@ public class Logic {
                 l.setParent(parent);
             }
         }
-        // TODO: level change
+        prop.increaseLevelBy(parent.getLevel() + 1);
         parent.insertLiterals(pos, prop.getLiterals());
     }
 }
