@@ -56,11 +56,6 @@ public class GroundLiteral extends Literal {
     }
 
     @Override
-    public boolean appearsInFrame(Literal literal) {
-        return isSameLiteral(literal);
-    }
-
-    @Override
     public String toString() {
         return variableName + " ";
     }

@@ -139,7 +139,6 @@ public class InputPanel extends JScrollPane {
                         "Records in the proof panel will be clicked",
                         "Warning",
                         JOptionPane.WARNING_MESSAGE);
-                refreshParent.run();
                 logic.switchMode();
                 for (Card card : variables) {
                     card.switchEditable();

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Peirce:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Peirce_jar</output-path>
+    <root id="archive" name="Peirce.jar">
+      <element id="module-output" name="Peirce" />
+    </root>
+  </artifact>
+</component>

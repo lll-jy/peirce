@@ -57,10 +57,6 @@ public class Proposition {
         return level;
     }
 
-    public CutLiteral getEnclosingLiteral() {
-        return enclosingLiteral;
-    }
-
     /**
      * Gets the list of literals of proposition.
      * @return the list of literals.
@@ -313,20 +309,6 @@ public class Proposition {
         }
         assert enclosingLiteral != null;
         return enclosingLiteral.getParent().appearsInAncestors(literal);
-    }
-
-    /**
-     * Checks whether a literal of a given form appears in some frames under this proposition.
-     * @param literal the literal to find.
-     * @return true if it appears.
-     */
-    public boolean appearsInFrame(Literal literal) {
-        for (Literal l : literals) {
-            if (l != literal && l.appearsInFrame(literal)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

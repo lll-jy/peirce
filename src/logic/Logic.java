@@ -303,4 +303,8 @@ public class Logic {
         prop.increaseLevelBy(parent.getLevel() + 1);
         parent.insertLiterals(pos, prop.getLiterals());
     }
+
+    public boolean succeeds() {
+        return getTheorem().hasSameLiterals(getProposition());
+    }
 }

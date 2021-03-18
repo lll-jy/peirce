@@ -14,7 +14,15 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class ProofPanel extends JPanel {
     private final Logic logic;
@@ -100,6 +108,7 @@ public class ProofPanel extends JPanel {
                         resultDisplay.setText(err.getMessage());
                     }
                 }
+                checkSuccess();
             }
 
             @Override
@@ -110,10 +119,18 @@ public class ProofPanel extends JPanel {
         workPanel.add(theoremDisplay);
         JPanel btnPanel = new JPanel();
         btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.Y_AXIS));;
+        try {
+            Path path = Paths.get("images/");
+            Files.createDirectories(path);
+        } catch (IOException e) {
+            assert false;
+        }
+        getImage("https://i.ibb.co/7Xzf5Pd/double-cut.png", "images/double_cut.png");
         Icon icon1 = new ImageIcon(new ImageIcon("images/double_cut.png").getImage()
-                .getScaledInstance(25,25,Image.SCALE_SMOOTH));
+                        .getScaledInstance(25,25,Image.SCALE_SMOOTH));
         addDoubleCutBtn = new JButton(icon1);
         btnPanel.add(addDoubleCutBtn);
+        getImage("https://i.ibb.co/qp4vmzW/remove-double-cut.png", "images/remove_double_cut.png");
         Icon icon2 = new ImageIcon(new ImageIcon("images/remove_double_cut.png").getImage()
                 .getScaledInstance(25,25,Image.SCALE_SMOOTH));
         removeDoubleCutBtn = new JButton(icon2);
@@ -132,6 +149,7 @@ public class ProofPanel extends JPanel {
                 logic.addDoubleCut(start, end);
                 theoremDisplay.setText(logic.getProposition().toString());
                 resultDisplay.setText(String.format("Add double cut from %d to %d", start, end));
+                checkSuccess();
             } catch (InvalidSelectionException err) {
                 resultDisplay.setText(err.getMessage());
             }
@@ -143,11 +161,31 @@ public class ProofPanel extends JPanel {
                 logic.removeDoubleCut(start, end);
                 theoremDisplay.setText(logic.getProposition().toString());
                 resultDisplay.setText(String.format("Double cut removed from %d to %d", start, end));
+                checkSuccess();
             } catch (InvalidSelectionException | InvalidInferenceException err) {
                 resultDisplay.setText(err.getMessage());
             }
         });
         add(resultPanel);
+    }
+
+    // Reference: https://stackoverflow.com/questions/10292792/getting-image-from-url-java/26234404
+    private void getImage(String urlStr, String dest) {
+        try {
+            URL url = new URL(urlStr);
+            InputStream is = url.openStream();
+            OutputStream os = new FileOutputStream(dest);
+
+            byte[] b = new byte[2048];
+            int length;
+            while ((length = is.read(b)) != -1) {
+                os.write(b, 0, length);
+            }
+            is.close();
+            os.close();
+        } catch (Exception e) {
+            assert false;
+        }
     }
 
     /**
@@ -156,8 +194,22 @@ public class ProofPanel extends JPanel {
     public void refresh() {
         revalidate();
         repaint();
+        addDoubleCutBtn.setEnabled(true);
+        removeDoubleCutBtn.setEnabled(true);
         goalDisplay.setText(String.format("Goal: %s", logic.getTheorem()));
         theoremDisplay.setText(logic.getProposition().toString());
         resultDisplay.setText("");
+        checkSuccess();
+    }
+
+    private void checkSuccess() {
+        if (logic.succeeds()) {
+            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
+                    "Congratulations! Proof succeeded!",
+                    "Success Notice",
+                    JOptionPane.INFORMATION_MESSAGE);
+            addDoubleCutBtn.setEnabled(false);
+            removeDoubleCutBtn.setEnabled(false);
+        }
     }
 }
