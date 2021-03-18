@@ -1,13 +1,15 @@
 package ui;
 
 import logic.Logic;
-import model.Proposition;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 public class ProofPanel extends JPanel {
     private final Logic logic;
@@ -18,10 +20,12 @@ public class ProofPanel extends JPanel {
     private final JButton removeDoubleCutBtn;
     private final JPanel resultPanel;
     private final JLabel resultDisplay;
+    private final Clipboard clipboard;
 
     public ProofPanel(Logic logic) {
         super();
         this.logic = logic;
+        this.clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -49,6 +53,25 @@ public class ProofPanel extends JPanel {
                 super.focusLost(e);
             }
         });
+        theoremDisplay.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            // TODO
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_X && e.isControlDown()) {
+                    resultDisplay.setText("cut");
+                } else if (e.getKeyCode() == KeyEvent.VK_V && e.isControlDown()) {
+                    resultDisplay.setText("paste");
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+        });
         theoremDisplay.setPreferredSize(new Dimension(530, 100));
         workPanel.add(theoremDisplay);
         JPanel btnPanel = new JPanel();
@@ -68,16 +91,17 @@ public class ProofPanel extends JPanel {
         resultPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
         resultDisplay = new JLabel();
         resultPanel.add(resultDisplay);
+        // TODO
         addDoubleCutBtn.addActionListener(e -> {
             try {
                 resultDisplay.setText(theoremDisplay.getSelectedText() + "\n" +
-                        Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor));
+                        clipboard.getData(DataFlavor.stringFlavor));
             } catch (Exception exception) {
                 resultDisplay.setText(exception.getMessage());
             }
         });
         removeDoubleCutBtn.addActionListener(e -> {
-            resultDisplay.setText("" + theoremDisplay.getCaretPosition());
+            resultDisplay.setText("" + logic.getTokenIndex(theoremDisplay.getCaretPosition()));
         });
         add(resultPanel);
     }

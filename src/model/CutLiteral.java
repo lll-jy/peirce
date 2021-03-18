@@ -1,7 +1,5 @@
 package model;
 
-import java.util.Objects;
-
 /**
  * Cut form propositions as a literal.
  */
@@ -27,20 +25,21 @@ public class CutLiteral extends Literal {
     }
 
     @Override
+    public int getLength() {
+        return 2 + content.getLength();
+    }
+
+    @Override
+    public boolean isSameLiteral(Literal l) {
+        if (l instanceof CutLiteral) {
+            return content.hasSameLiterals(((CutLiteral) l).content);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public String toString() {
         return "[ " + content + "] ";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CutLiteral)) return false;
-        CutLiteral that = (CutLiteral) o;
-        return Objects.equals(content, that.content);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(content);
     }
 }

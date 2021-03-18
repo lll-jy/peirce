@@ -1,7 +1,5 @@
 package model;
 
-import java.util.Objects;
-
 /**
  * Literals that constitutes only one variable.
  */
@@ -19,20 +17,21 @@ public class GroundLiteral extends Literal {
     }
 
     @Override
+    public int getLength() {
+        return 1;
+    }
+
+    @Override
+    public boolean isSameLiteral(Literal l) {
+        if (l instanceof GroundLiteral) {
+            return variableName.equals(((GroundLiteral) l).variableName);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public String toString() {
         return variableName + " ";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof GroundLiteral)) return false;
-        GroundLiteral that = (GroundLiteral) o;
-        return Objects.equals(variableName, that.variableName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(variableName);
     }
 }

@@ -2,7 +2,6 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Propositions data structure.
@@ -48,6 +47,10 @@ public class Proposition {
         return enclosingLiteral;
     }
 
+    /**
+     * Gets the list of literals of proposition.
+     * @return the list of literals.
+     */
     public List<Literal> getLiterals() {
         return literals;
     }
@@ -57,20 +60,73 @@ public class Proposition {
      * @param p the other proposition to test.
      * @return true if they have the same literal list regardless of order.
      */
-    private boolean hasSameLiterals(Proposition p) {
+    public boolean hasSameLiterals(Proposition p) {
         if (p.literals.size() != literals.size()) {
             return false;
         } else {
             List<Literal> copy = new ArrayList<>(literals);
             for (Literal l : p.literals) {
-                if (copy.contains(l)) {
-                    copy.remove(l);
-                } else {
+                boolean removed = false;
+                for (Literal cl : copy) {
+                    if (cl.isSameLiteral(l)) {
+                        copy.remove(cl);
+                        removed = true;
+                        break;
+                    }
+                }
+                if (!removed) {
                     return false;
                 }
             }
         }
         return true;
+    }
+
+    /**
+     * Checks whether this is the base proposition.
+     * @return true if it is the base proposition.
+     */
+    public boolean isBaseProp() {
+        return level == 0;
+    }
+
+    /**
+     * Gets the index of a given literal in this proposition.
+     * @param l the literal to locate.
+     * @return the index of the literal.
+     */
+    public int getIndexOf(Literal l) {
+        return literals.indexOf(l);
+    }
+
+    /**
+     * Gets the start index of this proposition with respect to the entire proposition.
+     * @return the start token index of the proposition.
+     */
+    public int getStartIndex() {
+        if (isBaseProp()) {
+            return 0;
+        } else {
+            assert enclosingLiteral != null;
+            int base = enclosingLiteral.getStartIndex();
+            return base + 1;
+        }
+    }
+
+    /**
+     * Gets the last index (exclusive) of the proposition with respect to the entire proposition.
+     * @return the token index after the proposition.
+     */
+    public int getLastIndex() {
+        return getStartIndex() + getLength();
+    }
+
+    public int getLength() {
+        int count = 0;
+        for (Literal l : literals) {
+            count += l.getLength();
+        }
+        return count;
     }
 
     @Override
@@ -80,18 +136,5 @@ public class Proposition {
             sb.append(l.toString());
         }
         return sb.toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Proposition)) return false;
-        Proposition that = (Proposition) o;
-        return hasSameLiterals(that);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getLiterals());
     }
 }

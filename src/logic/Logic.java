@@ -138,4 +138,24 @@ public class Logic {
     public Proposition getProposition() {
         return proposition;
     }
+
+    /**
+     * Gets the token index of the cursor position, and the cursor must be in the gaps of tokens (including
+     * start and end).
+     * @param cursorPos the cursor position with respect to the theorem string.
+     * @return the token index of the token directly after the cursor, and -1 if the position is inside some token.
+     */
+    public int getTokenIndex(int cursorPos) {
+        if (cursorPos == 0) {
+            return 0;
+        }
+        String theorem = proposition.toString();
+        if (cursorPos == theorem.length()) {
+            return theorem.split(" ").length;
+        }
+        if (theorem.charAt(cursorPos) == ' ' || theorem.charAt(cursorPos - 1) == ' ') {
+            return theorem.substring(0, cursorPos).split(" ").length;
+        }
+        return -1;
+    }
 }
