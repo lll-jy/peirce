@@ -3,19 +3,13 @@ package ui;
 import logic.Logic;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * A card that displays a variable in the input panel.
  */
-public class VariableCard extends JPanel {
-    private final Logic logic;
-    private final String variableName;
-    private boolean isEditable;
-    private final JButton editVariableBtn;
-    private final JButton deleteVariableBtn;
+public class VariableCard extends Card {
 
     /**
      * Initializes a variable card.
@@ -26,36 +20,7 @@ public class VariableCard extends JPanel {
      */
     public VariableCard(Logic logic, String variableName, List<VariableCard> variables, JTextField inputField,
                         Runnable refresh) {
-        super();
-        this.logic = logic;
-        this.variableName = variableName;
-        setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
-        add(new JLabel("for all " + variableName + ", "));
-        editVariableBtn = new JButton("Edit");
-        editVariableBtn.addActionListener(e -> {
-            variables.removeIf(v -> v.variableName.equals(variableName));
-            logic.deleteVariable(variableName);
-            inputField.setText(variableName);
-            refresh.run();
-        });
-        add(editVariableBtn);
-        deleteVariableBtn = new JButton("Delete");
-        deleteVariableBtn.addActionListener(e -> {
-            variables.removeIf(v -> v.variableName.equals(variableName));
-            logic.deleteVariable(variableName);
-            refresh.run();
-        });
-        add(deleteVariableBtn);
-        this.isEditable = true;
-    }
-
-    /**
-     * Switches editable mode of the card.
-     */
-    public void switchEditable() {
-        isEditable = !isEditable;
-        editVariableBtn.setEnabled(isEditable);
-        deleteVariableBtn.setEnabled(isEditable);
+        super(logic, variableName, "for all %s, ", variables, inputField, logic::deleteVariable, refresh);
     }
 
     @Override
@@ -63,11 +28,11 @@ public class VariableCard extends JPanel {
         if (this == o) return true;
         if (!(o instanceof VariableCard)) return false;
         VariableCard that = (VariableCard) o;
-        return Objects.equals(variableName, that.variableName);
+        return Objects.equals(content, that.content);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(variableName);
+        return Objects.hash(content);
     }
 }

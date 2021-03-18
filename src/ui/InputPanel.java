@@ -44,6 +44,7 @@ public class InputPanel extends JScrollPane {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         buttons = new ArrayList<>();
 
+        //
         variableHeader = new JPanel();
         variableHeader.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
         JLabel variableLabel = new JLabel("Add Variable: ");
@@ -74,6 +75,7 @@ public class InputPanel extends JScrollPane {
         for (String variableName : logic.getVariables()) {
             variables.add(new VariableCard(logic, variableName, variables, variableInput, this::constructPanel));
         }
+        //
 
         langSelectorPanel = new JPanel();
         JComboBox<String> langSelector = new JComboBox<>(Logic.languages);
@@ -132,6 +134,37 @@ public class InputPanel extends JScrollPane {
         });
 
         constructPanel();
+    }
+
+    // TODO: generic
+    private void constructListPanel(String type, JPanel header, List<VariableCard> cards, JTextField inputField) {
+        header.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+        JLabel label = new JLabel(String.format("Add %s: ", type));
+        JButton addBtn = new JButton("Add");
+        addBtn.setText("Add");
+        header.add(label);
+        header.add(addBtn);
+        buttons.add(addBtn);
+
+        inputField.setMaximumSize(new Dimension(290, 30));
+        addBtn.addActionListener(e -> {
+            try {
+                String input = inputField.getText();
+                logic.addVariable(input);
+                cards.add(new VariableCard(logic, input, cards, inputField, this::constructPanel));
+                inputField.setText("");
+                constructPanel();
+            } catch (VariableNameException vne) {
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
+                        vne.getMessage(),
+                        "Invalid Variable Name Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        for (String variableName : logic.getVariables()) {
+            cards.add(new VariableCard(logic, variableName, cards, inputField, this::constructPanel));
+        }
     }
 
     /**
