@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
@@ -21,6 +24,23 @@ public abstract class Parser {
     public static String INVALID_TOKENS_ERR_MSG = "Please check your proposition, some tokens are invalid.";
     public static String INVALID_SYNTAX_ERR_MSG = "Please check your proposition, the syntax seems incorrect.";
     public static String EMPTY_ERR_MSG = "Please enter your theorem to prove.";
+
+    public static void main(String[] args) {
+        try {
+            System.out.println(1);
+            Runtime.getRuntime().exec("mkdir try").waitFor();
+            System.out.println(2);
+            Runtime.getRuntime().exec("swipl").waitFor();
+            System.out.println(3);
+            Runtime.getRuntime().exec("open(\"try/peirce.txt\",write,O), write(O,\"!!ERROR\"), close(O).").waitFor();
+            System.out.println(4);
+            Runtime.getRuntime().exec("halt.").waitFor();
+            System.out.println(5);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            assert false;
+        }
+    }
 
     protected final List<String> variables;
 
@@ -74,6 +94,12 @@ public abstract class Parser {
         }
         String[] tokens = tokenize(theorem);
         writeTokensToFile(tokens);
+        try {
+            Path path = Paths.get("prolog/");
+            Files.createDirectories(path);
+        } catch (IOException e) {
+            assert false;
+        }
         try {
             Runtime.getRuntime().exec("swipl -f prolog/syntax.pl").waitFor();
         } catch (Exception e) {

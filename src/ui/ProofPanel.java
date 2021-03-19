@@ -4,6 +4,8 @@ import logic.Logic;
 import logic.exceptions.InvalidInferenceException;
 import logic.exceptions.InvalidSelectionException;
 import logic.exceptions.TheoremParseException;
+import static ui.Ui.DC_IMG;
+import static ui.Ui.RDC_IMG;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,12 +16,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -119,21 +116,15 @@ public class ProofPanel extends JPanel {
         workPanel.add(theoremDisplay);
         JPanel btnPanel = new JPanel();
         btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.Y_AXIS));;
-        try {
-            Path path = Paths.get("images/");
-            Files.createDirectories(path);
-        } catch (IOException e) {
-            assert false;
-        }
-        getImage("https://i.ibb.co/7Xzf5Pd/double-cut.png", "images/double_cut.png");
-        Icon icon1 = new ImageIcon(new ImageIcon("images/double_cut.png").getImage()
+        Icon icon1 = new ImageIcon(new ImageIcon(DC_IMG).getImage()
                         .getScaledInstance(25,25,Image.SCALE_SMOOTH));
         addDoubleCutBtn = new JButton(icon1);
+        addDoubleCutBtn.setEnabled(false);
         btnPanel.add(addDoubleCutBtn);
-        getImage("https://i.ibb.co/qp4vmzW/remove-double-cut.png", "images/remove_double_cut.png");
-        Icon icon2 = new ImageIcon(new ImageIcon("images/remove_double_cut.png").getImage()
+        Icon icon2 = new ImageIcon(new ImageIcon(RDC_IMG).getImage()
                 .getScaledInstance(25,25,Image.SCALE_SMOOTH));
         removeDoubleCutBtn = new JButton(icon2);
+        removeDoubleCutBtn.setEnabled(false);
         btnPanel.add(removeDoubleCutBtn);
         workPanel.add(btnPanel);
         add(workPanel);
@@ -167,25 +158,6 @@ public class ProofPanel extends JPanel {
             }
         });
         add(resultPanel);
-    }
-
-    // Reference: https://stackoverflow.com/questions/10292792/getting-image-from-url-java/26234404
-    private void getImage(String urlStr, String dest) {
-        try {
-            URL url = new URL(urlStr);
-            InputStream is = url.openStream();
-            OutputStream os = new FileOutputStream(dest);
-
-            byte[] b = new byte[2048];
-            int length;
-            while ((length = is.read(b)) != -1) {
-                os.write(b, 0, length);
-            }
-            is.close();
-            os.close();
-        } catch (Exception e) {
-            assert false;
-        }
     }
 
     /**
