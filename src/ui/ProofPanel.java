@@ -176,7 +176,7 @@ public class ProofPanel extends JPanel {
         historyPanel.setLayout(new BoxLayout(historyPanel, BoxLayout.Y_AXIS));
         JScrollPane historyPane = new JScrollPane(historyPanel);
         historyPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        historyPane.setPreferredSize(new Dimension(400, 365));
+        historyPane.setPreferredSize(new Dimension(400, 355));
         helperToolPanel.add(historyPane);
         historyLabels = new ArrayList<>();
         undoBtn = new JButton("Undo");
@@ -220,7 +220,19 @@ public class ProofPanel extends JPanel {
         redoBtn.setEnabled(false);
         labelPanel.add(redoBtn);
         // TODO: draft panel
-        //JPanel draftPanel = new JPanel();
+        JPanel draftPanel = new JPanel();
+        draftPanel.setLayout(new BoxLayout(draftPanel, BoxLayout.Y_AXIS));
+        JPanel draftLabelPanel = new JPanel();
+        draftLabelPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+        draftLabelPanel.add(new JLabel("<html>You may do some <br/>rough work here:</html>"));
+        draftPanel.add(draftLabelPanel);
+        JTextArea roughWorkArea = new JTextArea();
+        roughWorkArea.setLineWrap(true);
+        roughWorkArea.setAutoscrolls(true);
+        roughWorkArea.setMargin(new Insets(5, 5, 5, 5));
+        roughWorkArea.setPreferredSize(new Dimension(160, 300));
+        draftPanel.add(roughWorkArea);
+        helperToolPanel.add(draftPanel);
         add(helperToolPanel);
     }
 
