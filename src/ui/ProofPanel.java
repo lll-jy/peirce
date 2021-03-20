@@ -219,7 +219,6 @@ public class ProofPanel extends JPanel {
         });
         redoBtn.setEnabled(false);
         labelPanel.add(redoBtn);
-        // TODO: draft panel
         JPanel draftPanel = new JPanel();
         draftPanel.setLayout(new BoxLayout(draftPanel, BoxLayout.Y_AXIS));
         JPanel draftLabelPanel = new JPanel();

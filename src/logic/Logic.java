@@ -13,6 +13,7 @@ import model.InferenceRule;
 import model.Literal;
 import model.Model;
 import model.Proposition;
+import storage.Storage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class Logic {
     private Mode mode;
     private final Stack<Inference> history;
     private final Stack<Inference> reverseHistory;
+    private String filePath;
 
     /**
      * Initializes a Logic component based on the model, and initially the default language is Coq, and
@@ -43,6 +45,7 @@ public class Logic {
         this.mode = Mode.DECLARATION;
         this.history = new Stack<>();
         this.reverseHistory = new Stack<>();
+        this.filePath = "theorem.txt";
     }
 
     /**
@@ -243,7 +246,7 @@ public class Logic {
         }
         parent.replaceLiterals(literals, result);
         String to = getProposition().toString();
-        insertHistory(new Inference(from, to, InferenceRule.DOUBLE_CUT_ELIM, s, e));
+        insertHistory(new Inference(from, to, InferenceRule.DOUBLE_CUT_ELIM));
     }
 
     /**
@@ -284,7 +287,7 @@ public class Logic {
             parent.replaceLiterals(literals, newLiterals);
         }
         String to = getProposition().toString();
-        insertHistory(new Inference(from, to, InferenceRule.DOUBLE_CUT_INTRO, s, e));
+        insertHistory(new Inference(from, to, InferenceRule.DOUBLE_CUT_INTRO));
     }
 
     /**
@@ -311,13 +314,13 @@ public class Logic {
         String to = getProposition().toString();
         if (erasureApplied) {
             if (deiterationApplied) {
-                insertHistory(new Inference(from, to, InferenceRule.REMOVE_BOTH, s, e));
+                insertHistory(new Inference(from, to, InferenceRule.REMOVE_BOTH));
             } else {
-                insertHistory(new Inference(from, to, InferenceRule.ERASURE, s, e));
+                insertHistory(new Inference(from, to, InferenceRule.ERASURE));
             }
         } else {
             if (deiterationApplied) {
-                insertHistory(new Inference(from, to, InferenceRule.DEITERATION, s, e));
+                insertHistory(new Inference(from, to, InferenceRule.DEITERATION));
             }
         }
     }
@@ -350,13 +353,13 @@ public class Logic {
         String to = getProposition().toString();
         if (insertionApplied) {
             if (iterationApplied) {
-                insertHistory(new Inference(from, to, InferenceRule.INSERT_BOTH, pos, pos));
+                insertHistory(new Inference(from, to, InferenceRule.INSERT_BOTH));
             } else {
-                insertHistory(new Inference(from, to, InferenceRule.INSERTION, pos, pos));
+                insertHistory(new Inference(from, to, InferenceRule.INSERTION));
             }
         } else {
             if (iterationApplied) {
-                insertHistory(new Inference(from, to, InferenceRule.ITERATION, pos, pos));
+                insertHistory(new Inference(from, to, InferenceRule.ITERATION));
             }
         }
     }
@@ -407,5 +410,29 @@ public class Logic {
         Proposition prop = history.peek().getResultingProposition(getVariables());
         model.setProposition(prop);
         return history.peek();
+    }
+
+    /**
+     * Gets the list of propositions of premises as Java instances.
+     * @return the list of premises.
+     */
+    public List<Proposition> getPremisePropositions() {
+        return model.getPremises();
+    }
+
+    /**
+     * Gets the proof step history that is currently in the application.
+     * @return the history stack.
+     */
+    public Stack<Inference> getHistory() {
+        return history;
+    }
+
+    public void dummy() {
+        System.out.println("called here");
+    }
+
+    public void save() {
+        Storage.saveProof(filePath, this);
     }
 }

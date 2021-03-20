@@ -6,8 +6,7 @@ package model;
 public enum InferenceRule {
     ERASURE, INSERTION, ITERATION, DEITERATION, DOUBLE_CUT_INTRO, DOUBLE_CUT_ELIM, REMOVE_BOTH, INSERT_BOTH;
 
-    @Override
-    public String toString() {
+    public String printString() {
         return switch (this) {
             case ERASURE -> "Erasure";
             case INSERTION -> "Insertion";

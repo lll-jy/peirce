@@ -150,7 +150,7 @@ public class Ui {
         // Panel setup
         ProofPanel proofPanel = new ProofPanel(logic);
         JPanel panel = new JPanel();
-        JMenuBar menuBar = new MenuBar();
+        JMenuBar menuBar = new MenuBar(logic);
         JScrollPane inputPanel = new InputPanel(logic,  () -> {
             panel.revalidate();
             panel.repaint();

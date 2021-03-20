@@ -35,10 +35,18 @@ public class Model {
 
     /**
      * Gets the list of premises recognizable in this model.
-     * @return the list of premises.
+     * @return the list of premises in the input string format.
      */
     public List<String> getPremisesStrings() {
         return premisesStrings;
+    }
+
+    /**
+     * Gets the list of premises recognizable in this model.
+     * @return the list of premises as Java Proposition instance.
+     */
+    public List<Proposition> getPremises() {
+        return premises;
     }
 
     /**
