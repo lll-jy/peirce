@@ -15,7 +15,8 @@ coq_prop(and(X,Y)) --> coq_term(X), coq_and, coq_term(Y).
 coq_prop(not(X)) --> coq_not, coq_term(X).
 coq_prop(not(and(not(X),not(Y)))) --> coq_term(X), coq_or, coq_term(Y).
 coq_prop(not(and(X,not(Y)))) --> coq_term(X), coq_imply, coq_term(Y).
-coq_prop(and(not(and(X,not(Y))),not(and(Y,not(X))))) --> coq_term(X), coq_biconditional, coq_term(Y).
+coq_prop(and(not(and(X,not(Y))),not(and(Y,not(X))))) --> 
+  coq_term(X), coq_biconditional, coq_term(Y).
 
 coq_and --> ["/\\"].
 coq_or --> ["\\/"].
@@ -54,8 +55,7 @@ functor_to_peirce(X,[X]):-string(X),!.
 functor_to_peirce(l(X),L):-!, functor_to_peirce(X,L).
 functor_to_peirce(not(X),[frame(L)]):-!, functor_to_peirce(X,L).
 functor_to_peirce(and(X,Y),L):-
-  functor_to_peirce(X,XL), functor_to_peirce(Y,YL),
-  append(XL,YL,L).
+  functor_to_peirce(X,XL), functor_to_peirce(Y,YL), append(XL,YL,L).
 
 write_to_stream([],_):-!.
 write_to_stream([H|T],O):-

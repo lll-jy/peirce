@@ -136,17 +136,19 @@ public abstract class Literal {
     };
 
     /**
-     * Checks whether this literal can be removed by some inference rule.
-     * @return true if it can be removed.
+     * Gets the rule applied if this literal gets deleted.
+     * @return the inference rule applied for deleting this literal.
+     * @throws InvalidInferenceException if the literal is not deletable by any inference rule.
      */
-    public boolean canDelete() {
-        // Erasure
-        if (parent.getLevel() % 2 == 0 && !parent.isSingleLiteralProp()) {
-            return true;
+    public InferenceRule getDeleteRule() throws InvalidInferenceException {
+        if (parent.getLevel() % 2 == 0) {
+            return InferenceRule.ERASURE;
+        } else if (parent.appearsInAncestors(this)) {
+            return InferenceRule.DEITERATION;
+        } else {
+            throw new InvalidInferenceException("Some literals selected cannot be removed.");
         }
-        // Deiteration
-        return parent.appearsInAncestors(this);
-    };
+    }
 
     /**
      * Increases the level of the literal and its enclosing content.

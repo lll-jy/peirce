@@ -1,5 +1,6 @@
 package model;
 
+import logic.exceptions.InvalidInferenceException;
 import logic.exceptions.InvalidSelectionException;
 
 import java.util.ArrayList;
@@ -277,27 +278,26 @@ public class Proposition {
     }
 
     /**
-     * Checks whether this proposition is a single-literal proposition.
-     * @return true if this proposition is a single-literal proposition.
+     * Gets the inference rule applied if the literal is inserted to this proposition.
+     * @param literal the literal to insert.
+     * @return the rule applied for this insertion.
+     * @throws InvalidInferenceException if the literal is not insertable.
      */
-    public boolean isSingleLiteralProp() {
-        return literals.size() == 1;
+    public InferenceRule getInsertRule(Literal literal) throws InvalidInferenceException {
+        if (level % 2 == 1) {
+            return InferenceRule.INSERTION;
+        } else if (appearsInAncestors(literal)) {
+            return InferenceRule.ITERATION;
+        } else {
+            throw new InvalidInferenceException("This diagram is not insertable to this place.");
+        }
     }
 
     /**
-     * Checks whether a literal can be inserted in this proposition.
+     * Checks whether a same literal appears in ancestors, i.e. frames enclosing this one.
      * @param literal the literal to check.
-     * @return true if the literal can be inserted.
+     * @return true if it is found.
      */
-    public boolean canInsert(Literal literal) {
-        // Insertion
-        if (level % 2 == 1) {
-            return true;
-        }
-        // Iteration
-        return appearsInAncestors(literal);
-    }
-
     public boolean appearsInAncestors(Literal literal) {
         for (Literal l : literals) {
             if (l.isSameLiteral(literal)) {

@@ -1,0 +1,20 @@
+@startuml
+skinparam classAttributeIconSize 0
+!include style.puml
+
+class Proposition MODEL_COLOR {
+<color:#white>- level: int
+}
+abstract class Literal MODEL_COLOR_T3
+class CutLiteral MODEL_COLOR_T4 {
+}
+class GroundLiteral MODEL_COLOR_T4 {
+<color:#white>- variableName: String
+}
+
+Literal <|-- GroundLiteral
+Literal <|-- CutLiteral
+Proposition "1" -- "*" CutLiteral : enclosing
+Proposition "1" -- "*" Literal : literals
+
+@enduml

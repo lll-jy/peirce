@@ -17,10 +17,10 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
+/**
+ * The panel that the user constructs the reasoning for proof.
+ */
 public class ProofPanel extends JPanel {
     private final Logic logic;
     private final JPanel goalPanel;
@@ -34,6 +34,10 @@ public class ProofPanel extends JPanel {
     private final JLabel resultDisplay;
     private final Clipboard clipboard;
 
+    /**
+     * Constructs the proof panel.
+     * @param logic the logic component that the application is built based on.
+     */
     public ProofPanel(Logic logic) {
         super();
         this.logic = logic;
@@ -84,8 +88,7 @@ public class ProofPanel extends JPanel {
                         int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
                         int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
                         logic.cut(start, end);
-                        theoremDisplay.setText(logic.getProposition().toString());
-                        resultDisplay.setText(String.format("%d to %d removed", start, end));
+                        updateResult();
                     } catch (InvalidSelectionException | InvalidInferenceException err) {
                         resultDisplay.setText(err.getMessage());
                     }
@@ -98,8 +101,7 @@ public class ProofPanel extends JPanel {
                         }
                         String toInsert = clipboard.getData(DataFlavor.stringFlavor).toString();
                         logic.paste(pos, toInsert);
-                        theoremDisplay.setText(logic.getProposition().toString());
-                        resultDisplay.setText(String.format("%s inserted to %d", toInsert, pos));
+                        updateResult();
                     } catch (InvalidSelectionException | InvalidInferenceException | TheoremParseException |
                             UnsupportedFlavorException | IOException err) {
                         resultDisplay.setText(err.getMessage());
@@ -138,8 +140,7 @@ public class ProofPanel extends JPanel {
                 int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
                 int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
                 logic.addDoubleCut(start, end);
-                theoremDisplay.setText(logic.getProposition().toString());
-                resultDisplay.setText(String.format("Add double cut from %d to %d", start, end));
+                updateResult();
                 checkSuccess();
             } catch (InvalidSelectionException err) {
                 resultDisplay.setText(err.getMessage());
@@ -150,8 +151,7 @@ public class ProofPanel extends JPanel {
                 int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
                 int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
                 logic.removeDoubleCut(start, end);
-                theoremDisplay.setText(logic.getProposition().toString());
-                resultDisplay.setText(String.format("Double cut removed from %d to %d", start, end));
+                updateResult();
                 checkSuccess();
             } catch (InvalidSelectionException | InvalidInferenceException err) {
                 resultDisplay.setText(err.getMessage());
@@ -174,6 +174,9 @@ public class ProofPanel extends JPanel {
         checkSuccess();
     }
 
+    /**
+     * Checks whether the proof succeeds and show a dialogue if yes.
+     */
     private void checkSuccess() {
         if (logic.succeeds()) {
             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
@@ -183,5 +186,13 @@ public class ProofPanel extends JPanel {
             addDoubleCutBtn.setEnabled(false);
             removeDoubleCutBtn.setEnabled(false);
         }
+    }
+
+    /**
+     * Update the result after each step of inference.
+     */
+    private void updateResult() {
+        theoremDisplay.setText(logic.getProposition().toString());
+        resultDisplay.setText(logic.getLastLog());
     }
 }

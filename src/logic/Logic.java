@@ -6,12 +6,15 @@ import logic.exceptions.TheoremParseException;
 import logic.exceptions.VariableNameException;
 import logic.parser.Parser;
 import model.CutLiteral;
+import model.Inference;
+import model.InferenceRule;
 import model.Literal;
 import model.Model;
 import model.Proposition;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Pattern;
 
 /**
@@ -24,6 +27,8 @@ public class Logic {
     private final Model model;
     private Language language;
     private Mode mode;
+    private final Stack<Inference> history;
+    private final Stack<Inference> reverseHistory;
 
     /**
      * Initializes a Logic component based on the model, and initially the default language is Coq, and
@@ -34,6 +39,8 @@ public class Logic {
         this.model = model;
         this.language = Language.Coq;
         this.mode = Mode.DECLARATION;
+        this.history = new Stack<>();
+        this.reverseHistory = new Stack<>();
     }
 
     /**
@@ -204,6 +211,15 @@ public class Logic {
     }
 
     /**
+     * Inserts an application of inference rule to the history.
+     * @param inference the inference step to insert.
+     */
+    private void insertHistory(Inference inference) {
+        history.push(inference);
+        reverseHistory.removeAllElements();
+    }
+
+    /**
      * Removes double cut in the selected part if it is in the form "[ [ proposition ] ]".
      * @param s the start token index selected.
      * @param e the end token index selected (exclusive).
@@ -213,6 +229,7 @@ public class Logic {
     public void removeDoubleCut(int s, int e) throws InvalidSelectionException, InvalidInferenceException {
         List<Literal> literals = getSelected(s, e);
         Proposition parent = getCursorProp(s);
+        String from = getProposition().toString();
         if (literals.size() != 1) {
             throw new InvalidInferenceException("Please select a single literal to remove double cuts.");
         }
@@ -223,6 +240,8 @@ public class Logic {
             l.setParent(parent);
         }
         parent.replaceLiterals(literals, result);
+        String to = getProposition().toString();
+        insertHistory(new Inference(from, to, InferenceRule.DOUBLE_CUT_ELIM, s, e));
     }
 
     /**
@@ -241,6 +260,7 @@ public class Logic {
      * @throws InvalidSelectionException if the selected part is not a valid proposition.
      */
     public void addDoubleCut(int s, int e) throws InvalidSelectionException {
+        String from = getProposition().toString();
         List<Literal> literals = getSelected(s, e);
         Proposition parent = getCursorProp(s);
         CutLiteral res = new CutLiteral(parent, null);
@@ -261,6 +281,8 @@ public class Logic {
             inner.addLiterals(literals);
             parent.replaceLiterals(literals, newLiterals);
         }
+        String to = getProposition().toString();
+        insertHistory(new Inference(from, to, InferenceRule.DOUBLE_CUT_INTRO, s, e));
     }
 
     /**
@@ -271,14 +293,31 @@ public class Logic {
      * @throws InvalidInferenceException if the part selected is not valid to remove by any inference rule.
      */
     public void cut(int s, int e) throws InvalidSelectionException, InvalidInferenceException {
+        String from = getProposition().toString();
         List<Literal> literals = getSelected(s, e);
         Proposition parent = getCursorProp(s);
+        boolean erasureApplied = false;
+        boolean deiterationApplied = false;
         for (Literal l : literals) {
-            if (!l.canDelete()) {
-                throw new InvalidInferenceException("Some literals selected cannot be removed.");
+            InferenceRule rule = l.getDeleteRule();
+            switch (rule) {
+                case ERASURE -> erasureApplied = true;
+                case DEITERATION -> deiterationApplied = true;
             }
         }
         parent.replaceLiterals(literals, new ArrayList<>());
+        String to = getProposition().toString();
+        if (erasureApplied) {
+            if (deiterationApplied) {
+                insertHistory(new Inference(from, to, InferenceRule.REMOVE_BOTH, s, e));
+            } else {
+                insertHistory(new Inference(from, to, InferenceRule.ERASURE, s, e));
+            }
+        } else {
+            if (deiterationApplied) {
+                insertHistory(new Inference(from, to, InferenceRule.DEITERATION, s, e));
+            }
+        }
     }
 
     /**
@@ -291,20 +330,52 @@ public class Logic {
      */
     public void paste(int pos, String str) throws TheoremParseException,
             InvalidSelectionException, InvalidInferenceException {
+        String from = getProposition().toString();
         Proposition prop = Parser.createParser(language, getVariables()).parseFrame(str);
         Proposition parent = getCursorProp(pos);
+        boolean insertionApplied = false;
+        boolean iterationApplied = false;
         for (Literal l : prop.getLiterals()) {
-            if (!parent.canInsert(l)) {
-                throw new InvalidInferenceException("This diagram is not insertable to this place.");
-            } else {
-                l.setParent(parent);
+            InferenceRule rule = parent.getInsertRule(l);
+            switch (rule) {
+                case INSERTION -> insertionApplied = true;
+                case ITERATION -> iterationApplied = true;
             }
+            l.setParent(parent);
         }
         prop.increaseLevelBy(parent.getLevel() + 1);
         parent.insertLiterals(pos, prop.getLiterals());
+        String to = getProposition().toString();
+        if (insertionApplied) {
+            if (iterationApplied) {
+                insertHistory(new Inference(from, to, InferenceRule.INSERT_BOTH, pos, pos));
+            } else {
+                insertHistory(new Inference(from, to, InferenceRule.INSERTION, pos, pos));
+            }
+        } else {
+            if (iterationApplied) {
+                insertHistory(new Inference(from, to, InferenceRule.ITERATION, pos, pos));
+            }
+        }
     }
 
+    /**
+     * Checks whether the proof is successful.
+     * @return true if the proposition currently held by the model is the same as goal.
+     */
     public boolean succeeds() {
         return getTheorem().hasSameLiterals(getProposition());
+    }
+
+    /**
+     * Get the string for user display that is last logged in history.
+     * @return the string as described.
+     */
+    public String getLastLog() {
+        if (!history.isEmpty()) {
+            return history.peek().userDisplay();
+        } else {
+            return "";
+        }
     }
 }
