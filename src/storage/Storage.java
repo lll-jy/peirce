@@ -1,6 +1,7 @@
 package storage;
 
 import logic.Logic;
+import logic.exceptions.FilePathException;
 import model.Inference;
 import model.Proposition;
 
@@ -16,12 +17,12 @@ public class Storage {
      * Creates the corresponding directory.
      * @param s the directory in the form of .../.../ (should ends with '/').
      */
-    public static void createDirectory(String s) {
+    public static void createDirectory(String s) throws FilePathException {
         try {
             Path path = Paths.get(s);
             Files.createDirectories(path);
         } catch (IOException e) {
-            assert false;
+            throw new FilePathException(e.getMessage());
         }
     }
 

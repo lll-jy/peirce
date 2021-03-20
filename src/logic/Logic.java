@@ -1,5 +1,6 @@
 package logic;
 
+import logic.exceptions.FilePathException;
 import logic.exceptions.InvalidInferenceException;
 import logic.exceptions.InvalidSelectionException;
 import logic.exceptions.RedoException;
@@ -26,6 +27,8 @@ import java.util.regex.Pattern;
 public class Logic {
     public static String[] languages = List.of("Coq", "LaTeX").toArray(new String[0]);
     public static Pattern variableRegex = Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*");
+    public static Pattern fileNameRegex = Pattern.compile(
+            "((([a-zA-Z_][a-zA-Z_ ]*)|[.][.])[/])*[a-zA-Z_][a-zA-Z_ ]*.txt");
 
     private final Model model;
     private Language language;
@@ -432,7 +435,25 @@ public class Logic {
         System.out.println("called here");
     }
 
+    /**
+     * Saves the current proof to file.
+     */
     public void save() {
         Storage.saveProof(filePath, this);
+    }
+
+    public void setFilePath(String path) throws FilePathException {
+        if (!fileNameRegex.matcher(path).matches()) {
+            throw new FilePathException("The file path seems not correct. Please make sure you use " +
+                    "/ as delimiters and save the file as a .txt file.");
+        }
+        String[] paths = path.split("/");
+        StringBuilder folder = new StringBuilder();
+        for (int i = 0; i < paths.length - 1; i++) {
+            folder.append(paths[i]);
+            folder.append("/");
+        }
+        Storage.createDirectory(folder.toString());
+        filePath = path;
     }
 }

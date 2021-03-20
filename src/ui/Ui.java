@@ -132,7 +132,11 @@ public class Ui {
     public void construct(Logic logic) {
         // File creation
         for (String s : directories) {
-            Storage.createDirectory(String.format("%s/", s));
+            try {
+                Storage.createDirectory(String.format("%s/", s));
+            } catch (Exception e) {
+                assert false;
+            }
         }
         getImage("https://i.ibb.co/7Xzf5Pd/double-cut.png", DC_IMG);
         getImage("https://i.ibb.co/qp4vmzW/remove-double-cut.png", RDC_IMG);
