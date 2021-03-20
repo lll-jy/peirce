@@ -151,5 +151,6 @@ public class Storage {
             };
             logic.insertHistory(new Inference(info[1], info[2], rule));
         }
+        logic.updateProposition();
     }
 }

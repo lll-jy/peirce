@@ -255,6 +255,17 @@ public class Logic {
     }
 
     /**
+     * Updates the proposition in the model by the last step in history.
+     */
+    public void updateProposition() {
+        if (history.isEmpty()) {
+            model.setProposition(new Proposition());
+        } else {
+            model.setProposition(history.peek().getResultingProposition(getVariables()));
+        }
+    }
+
+    /**
      * Removes double cut in the selected part if it is in the form "[ [ proposition ] ]".
      * @param s the start token index selected.
      * @param e the end token index selected (exclusive).

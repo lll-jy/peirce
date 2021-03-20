@@ -251,6 +251,11 @@ public class ProofPanel extends JPanel {
         resultDisplay.setForeground(Color.BLACK);
         historyPanel.removeAll();
         historyLabels.clear();
+        for (Inference i : logic.getHistory()) {
+            JLabel l = new JLabel(i.userDisplay());
+            historyLabels.add(l);
+            historyPanel.add(l);
+        }
         checkSuccess();
     }
 

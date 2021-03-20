@@ -4,7 +4,6 @@ import logic.Logic;
 import logic.exceptions.FileReadException;
 import logic.exceptions.TheoremParseException;
 import logic.exceptions.VariableNameException;
-import model.Proposition;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,7 +21,7 @@ public class InputPanel extends JScrollPane {
     private static String PROOF_TO_DECLARATION_BTN_MSG = "Edit declaration";
 
     private final Logic logic;
-    private final Runnable refreshParent;
+    private Runnable refreshParent;
     private final JPanel variableHeader;
     private final JTextField variableInput;
     private final List<Card> variables;
@@ -38,12 +37,10 @@ public class InputPanel extends JScrollPane {
     /**
      * Initializes an input panel.
      * @param logic the component that handles with the logic.
-     * @param refreshParent a runnable component that refreshes parent panel.
      */
-    public InputPanel(Logic logic, Runnable refreshParent) {
+    public InputPanel(Logic logic) {
         super(panel);
         this.logic = logic;
-        this.refreshParent = refreshParent;
 
         setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         setPreferredSize(new Dimension(300, 570));
@@ -120,6 +117,7 @@ public class InputPanel extends JScrollPane {
                     for (Card card : premises) {
                         card.switchEditable();
                     }
+                    logic.clearHistory();
                     refreshParent.run();
                 } catch (TheoremParseException tpe) {
                     JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
@@ -152,6 +150,14 @@ public class InputPanel extends JScrollPane {
         });
 
         constructPanel();
+    }
+
+    /**
+     * Sets the process to update parent.
+     * @param refresh the runnable process to update UI.
+     */
+    public void setRefresh(Runnable refresh) {
+        this.refreshParent = refresh;
     }
 
     /**
@@ -194,8 +200,14 @@ public class InputPanel extends JScrollPane {
             }
         });
 
-        for (String content : getContents.get()) {
-            cards.add(new VariableCard(logic, content, cards, inputField, this::constructPanel));
+        try {
+            for (String content : getContents.get()) {
+                cards.add(type
+                        .getConstructor(Logic.class, String.class, List.class, JTextField.class, Runnable.class)
+                        .newInstance(logic, content, cards, inputField, (Runnable) this::constructPanel));
+            }
+        } catch (Exception exception) {
+            assert false;
         }
     }
 
@@ -220,5 +232,21 @@ public class InputPanel extends JScrollPane {
         panel.add(theoremHeader);
         panel.add(theoremInput);
         panel.add(startProofBtnPanel);
+    }
+
+    /**
+     * Refreshes the input panel.
+     */
+    public void refresh() {
+        variables.clear();
+        for (String v : logic.getVariables()) {
+            variables.add(new VariableCard(logic, v, variables, variableInput, this::constructPanel));
+        }
+        premises.clear();
+        for (String p : logic.getPremises()) {
+            premises.add(new PremiseCard(logic, p, premises, premiseInput, this::constructPanel));
+        }
+        constructPanel();
+        theoremInput.setText(logic.getTheoremString());
     }
 }

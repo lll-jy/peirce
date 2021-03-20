@@ -1,8 +1,5 @@
 a 
 Coq
 0
-a->a
-3
-DOUBLE_CUT_INTRO&&[ [ ] ] 
-INSERTION&[ [ ] ] &[ [ ] a ] 
-ITERATION&[ [ ] a ] &[ [ a ] a ] 
+a->(a->a)
+0

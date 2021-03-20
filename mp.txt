@@ -1,0 +1,10 @@
+a b 
+Coq
+2
+a
+a->b
+b
+3
+DEITERATION&a [ a [ b ] ] &a [ [ b ] ] 
+ERASURE&a [ [ b ] ] &[ [ b ] ] 
+DOUBLE_CUT_ELIM&[ [ b ] ] &b 
