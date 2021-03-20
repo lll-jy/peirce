@@ -32,9 +32,33 @@ public class Inference {
         this.e = e;
     }
 
-    public Proposition getsOriginalProposition(List<String> variables) {
+    /**
+     * Gets the proposition as premise of the inference step.
+     * @param variables the list of variables to help parsing.
+     * @return the proposition Java instance.
+     */
+    public Proposition getOriginalProposition(List<String> variables) {
+        return parseProposition(variables, from);
+    }
+
+    /**
+     * Gets the proposition as conclusion of the inference step.
+     * @param variables the list of variables to help parsing.
+     * @return the proposition Java instance.
+     */
+    public Proposition getResultingProposition(List<String> variables) {
+        return parseProposition(variables, to);
+    }
+
+    /**
+     * Gets the proposition stored in the inference.
+     * @param variables the list of variables to help parsing.
+     * @param str the string to parse.
+     * @return the proposition Java instance.
+     */
+    private Proposition parseProposition(List<String> variables, String str) {
         try {
-            return Parser.createParser(Language.Coq, variables).parseFrame(from);
+            return Parser.createParser(Language.Coq, variables).parseFrame(str);
         } catch (TheoremParseException e) {
             assert false;
             return new Proposition();

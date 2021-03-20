@@ -3,8 +3,10 @@ package ui;
 import logic.Logic;
 import logic.exceptions.InvalidInferenceException;
 import logic.exceptions.InvalidSelectionException;
+import logic.exceptions.RedoException;
 import logic.exceptions.TheoremParseException;
 import logic.exceptions.UndoException;
+import model.Inference;
 import static ui.Ui.DC_IMG;
 import static ui.Ui.RDC_IMG;
 
@@ -35,6 +37,8 @@ public class ProofPanel extends JPanel {
     private final JTextArea theoremDisplay;
     private final JButton addDoubleCutBtn;
     private final JButton removeDoubleCutBtn;
+    private final JButton undoBtn;
+    private final JButton redoBtn;
     private final JLabel resultDisplay;
     private final JPanel historyPanel;
     private final Clipboard clipboard;
@@ -172,22 +176,20 @@ public class ProofPanel extends JPanel {
         historyPanel.setLayout(new BoxLayout(historyPanel, BoxLayout.Y_AXIS));
         JScrollPane historyPane = new JScrollPane(historyPanel);
         historyPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        historyPane.setPreferredSize(new Dimension(400, 370));
+        historyPane.setPreferredSize(new Dimension(400, 365));
         helperToolPanel.add(historyPane);
         historyLabels = new ArrayList<>();
-        // TODO: draft panel
-        JButton undo = new JButton("Undo");
-        undo.addActionListener(e -> {
+        undoBtn = new JButton("Undo");
+        undoBtn.addActionListener(e -> {
             try {
                 logic.undo();
                 historyPanel.removeAll();
-                System.out.println(historyLabels);
                 historyLabels.remove(historyLabels.size() - 1);
-                System.out.println(historyLabels);
                 for (JLabel l : historyLabels) {
                     historyPanel.add(l);
                 }
                 theoremDisplay.setText(logic.getProposition().toString());
+                resultDisplay.setForeground(Color.BLACK);
                 resultDisplay.setText("Undo");
                 revalidate();
                 repaint();
@@ -195,7 +197,29 @@ public class ProofPanel extends JPanel {
                 displayError(err);
             }
         });
-        labelPanel.add(undo);
+        undoBtn.setEnabled(false);
+        labelPanel.add(undoBtn);
+        redoBtn = new JButton("Redo");
+        redoBtn.addActionListener(e -> {
+            try {
+                Inference inference = logic.redo();
+                historyPanel.removeAll();;
+                historyLabels.add(new JLabel(inference.userDisplay()));
+                for (JLabel l : historyLabels) {
+                    historyPanel.add(l);
+                }
+                theoremDisplay.setText(logic.getProposition().toString());
+                resultDisplay.setForeground(Color.BLACK);
+                resultDisplay.setText("Redo");
+                revalidate();
+                repaint();
+            } catch (RedoException err) {
+                displayError(err);
+            }
+        });
+        redoBtn.setEnabled(false);
+        labelPanel.add(redoBtn);
+        // TODO: draft panel
         //JPanel draftPanel = new JPanel();
         add(helperToolPanel);
     }
@@ -208,6 +232,8 @@ public class ProofPanel extends JPanel {
         repaint();
         addDoubleCutBtn.setEnabled(true);
         removeDoubleCutBtn.setEnabled(true);
+        undoBtn.setEnabled(true);
+        redoBtn.setEnabled(true);
         goalDisplay.setText(String.format("Goal: %s", logic.getTheorem()));
         theoremDisplay.setText(logic.getProposition().toString());
         resultDisplay.setText("");
@@ -228,6 +254,8 @@ public class ProofPanel extends JPanel {
                     JOptionPane.INFORMATION_MESSAGE);
             addDoubleCutBtn.setEnabled(false);
             removeDoubleCutBtn.setEnabled(false);
+            undoBtn.setEnabled(false);
+            redoBtn.setEnabled(false);
             historyPanel.add(new JLabel("Q.E.D."));
         }
     }
