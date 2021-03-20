@@ -3,6 +3,7 @@ package logic;
 import logic.exceptions.InvalidInferenceException;
 import logic.exceptions.InvalidSelectionException;
 import logic.exceptions.TheoremParseException;
+import logic.exceptions.UndoException;
 import logic.exceptions.VariableNameException;
 import logic.parser.Parser;
 import model.CutLiteral;
@@ -377,5 +378,18 @@ public class Logic {
         } else {
             return "";
         }
+    }
+
+    /**
+     * Undoes the last inference step
+     * @throws UndoException if there are no steps to undo.
+     */
+    public void undo() throws UndoException {
+        if (history.isEmpty()) {
+            throw new UndoException();
+        }
+        reverseHistory.push(history.pop());
+        Proposition prop = reverseHistory.peek().getsOriginalProposition(getVariables());
+        model.setProposition(prop);
     }
 }

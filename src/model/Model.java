@@ -50,6 +50,14 @@ public class Model {
     }
 
     /**
+     * Sets the proposition of the model to a new one.
+     * @param prop the new proposition.
+     */
+    public void setProposition(Proposition prop) {
+        proposition = prop;
+    }
+
+    /**
      * Gets the theorem of the model.
      * @return the theorem.
      */

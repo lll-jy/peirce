@@ -4,11 +4,11 @@ import logic.Logic;
 import logic.exceptions.InvalidInferenceException;
 import logic.exceptions.InvalidSelectionException;
 import logic.exceptions.TheoremParseException;
+import logic.exceptions.UndoException;
 import static ui.Ui.DC_IMG;
 import static ui.Ui.RDC_IMG;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -16,23 +16,29 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Toolkit;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The panel that the user constructs the reasoning for proof.
  */
 public class ProofPanel extends JPanel {
     private final Logic logic;
-    private final JPanel goalPanel;
     private final JLabel goalDisplay;
-    private final JPanel labelPanel;
-    private final JPanel workPanel;
     private final JTextArea theoremDisplay;
     private final JButton addDoubleCutBtn;
     private final JButton removeDoubleCutBtn;
-    private final JPanel resultPanel;
     private final JLabel resultDisplay;
+    private final JPanel historyPanel;
     private final Clipboard clipboard;
+    private final List<JLabel> historyLabels;
 
     /**
      * Constructs the proof panel.
@@ -45,18 +51,18 @@ public class ProofPanel extends JPanel {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        goalPanel = new JPanel();
+        JPanel goalPanel = new JPanel();
         goalDisplay = new JLabel(String.format("Goal: %s", logic.getTheorem()));
         goalPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
         goalPanel.add(goalDisplay);
         add(goalPanel);
 
-        labelPanel = new JPanel();
+        JPanel labelPanel = new JPanel();
         labelPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
         labelPanel.add(new JLabel("Current Proposition:"));
         add(labelPanel);
 
-        workPanel = new JPanel();
+        JPanel workPanel = new JPanel();
         workPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
         theoremDisplay = new JTextArea();
         theoremDisplay.setLineWrap(true);
@@ -80,7 +86,6 @@ public class ProofPanel extends JPanel {
             public void keyTyped(KeyEvent e) {
             }
 
-            // TODO: logging
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_X && e.isControlDown()) {
@@ -90,7 +95,7 @@ public class ProofPanel extends JPanel {
                         logic.cut(start, end);
                         updateResult();
                     } catch (InvalidSelectionException | InvalidInferenceException err) {
-                        resultDisplay.setText(err.getMessage());
+                        displayError(err);
                     }
                 } else if (e.getKeyCode() == KeyEvent.VK_V && e.isControlDown()) {
                     try {
@@ -104,7 +109,7 @@ public class ProofPanel extends JPanel {
                         updateResult();
                     } catch (InvalidSelectionException | InvalidInferenceException | TheoremParseException |
                             UnsupportedFlavorException | IOException err) {
-                        resultDisplay.setText(err.getMessage());
+                        displayError(err);
                     }
                 }
                 checkSuccess();
@@ -119,7 +124,7 @@ public class ProofPanel extends JPanel {
         JPanel btnPanel = new JPanel();
         btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.Y_AXIS));;
         Icon icon1 = new ImageIcon(new ImageIcon(DC_IMG).getImage()
-                        .getScaledInstance(25,25,Image.SCALE_SMOOTH));
+                        .getScaledInstance(25,25, Image.SCALE_SMOOTH));
         addDoubleCutBtn = new JButton(icon1);
         addDoubleCutBtn.setEnabled(false);
         btnPanel.add(addDoubleCutBtn);
@@ -131,7 +136,7 @@ public class ProofPanel extends JPanel {
         workPanel.add(btnPanel);
         add(workPanel);
 
-        resultPanel = new JPanel();
+        JPanel resultPanel = new JPanel();
         resultPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
         resultDisplay = new JLabel();
         resultPanel.add(resultDisplay);
@@ -143,7 +148,7 @@ public class ProofPanel extends JPanel {
                 updateResult();
                 checkSuccess();
             } catch (InvalidSelectionException err) {
-                resultDisplay.setText(err.getMessage());
+                displayError(err);
             }
         });
         removeDoubleCutBtn.addActionListener(e -> {
@@ -154,10 +159,45 @@ public class ProofPanel extends JPanel {
                 updateResult();
                 checkSuccess();
             } catch (InvalidSelectionException | InvalidInferenceException err) {
-                resultDisplay.setText(err.getMessage());
+                displayError(err);
             }
         });
+        addDoubleCutBtn.setToolTipText("Double Cut Introduction");
+        removeDoubleCutBtn.setToolTipText("Double Cut Elimination");
         add(resultPanel);
+
+        JPanel helperToolPanel = new JPanel();
+        helperToolPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+        historyPanel = new JPanel();
+        historyPanel.setLayout(new BoxLayout(historyPanel, BoxLayout.Y_AXIS));
+        JScrollPane historyPane = new JScrollPane(historyPanel);
+        historyPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        historyPane.setPreferredSize(new Dimension(400, 370));
+        helperToolPanel.add(historyPane);
+        historyLabels = new ArrayList<>();
+        // TODO: draft panel
+        JButton undo = new JButton("Undo");
+        undo.addActionListener(e -> {
+            try {
+                logic.undo();
+                historyPanel.removeAll();
+                System.out.println(historyLabels);
+                historyLabels.remove(historyLabels.size() - 1);
+                System.out.println(historyLabels);
+                for (JLabel l : historyLabels) {
+                    historyPanel.add(l);
+                }
+                theoremDisplay.setText(logic.getProposition().toString());
+                resultDisplay.setText("Undo");
+                revalidate();
+                repaint();
+            } catch (UndoException err) {
+                displayError(err);
+            }
+        });
+        labelPanel.add(undo);
+        //JPanel draftPanel = new JPanel();
+        add(helperToolPanel);
     }
 
     /**
@@ -171,6 +211,9 @@ public class ProofPanel extends JPanel {
         goalDisplay.setText(String.format("Goal: %s", logic.getTheorem()));
         theoremDisplay.setText(logic.getProposition().toString());
         resultDisplay.setText("");
+        resultDisplay.setForeground(Color.BLACK);
+        historyPanel.removeAll();
+        historyLabels.clear();
         checkSuccess();
     }
 
@@ -185,6 +228,7 @@ public class ProofPanel extends JPanel {
                     JOptionPane.INFORMATION_MESSAGE);
             addDoubleCutBtn.setEnabled(false);
             removeDoubleCutBtn.setEnabled(false);
+            historyPanel.add(new JLabel("Q.E.D."));
         }
     }
 
@@ -194,5 +238,18 @@ public class ProofPanel extends JPanel {
     private void updateResult() {
         theoremDisplay.setText(logic.getProposition().toString());
         resultDisplay.setText(logic.getLastLog());
+        resultDisplay.setForeground(Color.BLACK);
+        JLabel logResult = new JLabel(logic.getLastLog());
+        historyLabels.add(logResult);
+        historyPanel.add(logResult);
+    }
+
+    /**
+     * Updates the result display given the exception.
+     * @param e the exception caught.
+     */
+    private void displayError(Exception e) {
+        resultDisplay.setText(e.getMessage());
+        resultDisplay.setForeground(Color.RED);
     }
 }

@@ -1,5 +1,11 @@
 package model;
 
+import logic.Language;
+import logic.exceptions.TheoremParseException;
+import logic.parser.Parser;
+
+import java.util.List;
+
 /**
  * An inference step to keep track of history.
  */
@@ -24,6 +30,15 @@ public class Inference {
         this.rule = rule;
         this.s = s;
         this.e = e;
+    }
+
+    public Proposition getsOriginalProposition(List<String> variables) {
+        try {
+            return Parser.createParser(Language.Coq, variables).parseFrame(from);
+        } catch (TheoremParseException e) {
+            assert false;
+            return new Proposition();
+        }
     }
 
     /**
