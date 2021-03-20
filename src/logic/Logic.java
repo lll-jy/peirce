@@ -1,6 +1,7 @@
 package logic;
 
 import logic.exceptions.FilePathException;
+import logic.exceptions.FileReadException;
 import logic.exceptions.InvalidInferenceException;
 import logic.exceptions.InvalidSelectionException;
 import logic.exceptions.RedoException;
@@ -28,7 +29,7 @@ public class Logic {
     public static String[] languages = List.of("Coq", "LaTeX").toArray(new String[0]);
     public static Pattern variableRegex = Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*");
     public static Pattern fileNameRegex = Pattern.compile(
-            "((([a-zA-Z_][a-zA-Z_ ]*)|[.][.])[/])*[a-zA-Z_][a-zA-Z_ ]*.txt");
+            "((([a-zA-Z0-9_][a-zA-Z0-9_ ]*)|[.][.])[/])*[a-zA-Z0-9_][a-zA-Z0-9_ ]*.txt");
 
     private final Model model;
     private Language language;
@@ -89,6 +90,14 @@ public class Logic {
     }
 
     /**
+     * Resets the variables in the model.
+     * @param variables the list of variables to update.
+     */
+    public void setVariables(List<String> variables) {
+        model.setVariables(variables);
+    }
+
+    /**
      * Removes a premise.
      * @param str the string representing the premise.
      */
@@ -142,10 +151,11 @@ public class Logic {
      * Sets the language for declaration.
      * @param language the string representing the language.
      */
-    public void setLanguage(String language) {
+    public void setLanguage(String language) throws FileReadException {
         switch (language) {
             case "Coq" -> this.language = Language.Coq;
             case "LaTeX" -> this.language = Language.LaTeX;
+            default -> throw new FileReadException();
         }
     }
 
@@ -162,9 +172,18 @@ public class Logic {
     /**
      * Sets the theorem to prove in this logic instance.
      * @param theorem the new proposition.
+     * @throws TheoremParseException if the string representing the theorem is not parsable in the language.
      */
-    public void setTheorem(Proposition theorem) {
-        model.setTheorem(theorem);
+    public void setTheorem(String theorem) throws TheoremParseException {
+        model.setTheorem(theorem, parse(theorem));
+    }
+
+    /**
+     * Gets the theorem in the language chosen.
+     * @return the string of the theorem written in the language chosen.
+     */
+    public String getTheoremString() {
+        return model.getTheoremString();
     }
 
     /**
@@ -222,9 +241,17 @@ public class Logic {
      * Inserts an application of inference rule to the history.
      * @param inference the inference step to insert.
      */
-    private void insertHistory(Inference inference) {
+    public void insertHistory(Inference inference) {
         history.push(inference);
         reverseHistory.removeAllElements();
+    }
+
+    /**
+     * Clears history.
+     */
+    public void clearHistory() {
+        history.clear();
+        reverseHistory.clear();
     }
 
     /**
@@ -416,14 +443,6 @@ public class Logic {
     }
 
     /**
-     * Gets the list of propositions of premises as Java instances.
-     * @return the list of premises.
-     */
-    public List<Proposition> getPremisePropositions() {
-        return model.getPremises();
-    }
-
-    /**
      * Gets the proof step history that is currently in the application.
      * @return the history stack.
      */
@@ -442,7 +461,12 @@ public class Logic {
         Storage.saveProof(filePath, this);
     }
 
-    public void setFilePath(String path) throws FilePathException {
+    /**
+     * Prepares the file path to save file to.
+     * @param path the path of the target file, including the file itself (i.e. .../.../...txt).
+     * @throws FilePathException if the file path given is invalid.
+     */
+    public void preparePath(String path) throws FilePathException {
         if (!fileNameRegex.matcher(path).matches()) {
             throw new FilePathException("The file path seems not correct. Please make sure you use " +
                     "/ as delimiters and save the file as a .txt file.");
@@ -455,5 +479,10 @@ public class Logic {
         }
         Storage.createDirectory(folder.toString());
         filePath = path;
+    }
+
+    public void open(String path) throws FilePathException, FileReadException {
+        filePath = path;
+        Storage.loadFile(path, this);
     }
 }

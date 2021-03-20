@@ -78,9 +78,9 @@ public class Inference {
     public String fileSave() {
         StringBuilder sb = new StringBuilder();
         sb.append(rule);
-        sb.append("|");
+        sb.append("&");
         sb.append(from);
-        sb.append("|");
+        sb.append("&");
         sb.append(to);
         return sb.toString();
     }

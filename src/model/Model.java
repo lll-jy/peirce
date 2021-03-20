@@ -11,6 +11,7 @@ public class Model {
     private final List<String> variables;
     private final List<String> premisesStrings;
     private final List<Proposition> premises;
+    private String theoremString;
     private Proposition theorem;
     private Proposition proposition;
 
@@ -31,6 +32,15 @@ public class Model {
      */
     public List<String> getVariables() {
         return variables;
+    }
+
+    /**
+     * Resets the variables in the model.
+     * @param variables the list of variables to update.
+     */
+    public void setVariables(List<String> variables) {
+        this.variables.clear();
+        this.variables.addAll(variables);
     }
 
     /**
@@ -77,7 +87,8 @@ public class Model {
      * Sets the theorem to the given new proposition.
      * @param theorem the new proposition.
      */
-    public void setTheorem(Proposition theorem) {
+    public void setTheorem(String str, Proposition theorem) {
+        this.theoremString = str;
         this.theorem = theorem;
         proposition = new Proposition();
         for (Proposition premise : premises) {
@@ -86,6 +97,14 @@ public class Model {
                 proposition.addLiteral(l);
             }
         }
+    }
+
+    /**
+     * Gets the string of the theorem to prove in the language.
+     * @return the string.
+     */
+    public String getTheoremString() {
+        return theoremString;
     }
 
     /**

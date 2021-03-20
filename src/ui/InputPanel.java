@@ -1,6 +1,7 @@
 package ui;
 
 import logic.Logic;
+import logic.exceptions.FileReadException;
 import logic.exceptions.TheoremParseException;
 import logic.exceptions.VariableNameException;
 import model.Proposition;
@@ -103,8 +104,7 @@ public class InputPanel extends JScrollPane {
         startProofBtn.addActionListener(e -> {
             if (logic.canModifyDeclaration()) {
                 try {
-                    Proposition result = logic.parse(theoremInput.getText());
-                    logic.setTheorem(result);
+                    logic.setTheorem(theoremInput.getText());
                     startProofBtn.setText(PROOF_TO_DECLARATION_BTN_MSG);
                     logic.setLanguage((String) langSelector.getSelectedItem());
                     for (JButton button : buttons) {
@@ -126,6 +126,8 @@ public class InputPanel extends JScrollPane {
                             tpe.getMessage(),
                             "", JOptionPane.ERROR_MESSAGE
                     );
+                } catch (FileReadException fre) {
+                    assert false;
                 }
             } else {
                 startProofBtn.setText(DECLARATION_TO_PROOF_BTN_MSG);

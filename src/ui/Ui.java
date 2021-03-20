@@ -154,14 +154,14 @@ public class Ui {
         // Panel setup
         ProofPanel proofPanel = new ProofPanel(logic);
         JPanel panel = new JPanel();
-        JMenuBar menuBar = new MenuBar(logic);
-        JScrollPane inputPanel = new InputPanel(logic,  () -> {
+        Runnable refresh = () -> {
             panel.revalidate();
             panel.repaint();
             proofPanel.refresh();
-        });
+        };
+        JMenuBar menuBar = new MenuBar(logic, refresh);
+        JScrollPane inputPanel = new InputPanel(logic, refresh);
 
-        // TODO: other UI components
         panel.add(proofPanel);
 
         // Frame building
