@@ -66,9 +66,6 @@ public class MenuBar extends JMenuBar {
             }
         });
 
-        JMenuItem helpMenu = new JMenuItem("Help");
-
         add(fileMenu);
-        add(helpMenu);
     }
 }

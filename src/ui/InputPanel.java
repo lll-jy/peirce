@@ -136,7 +136,7 @@ public class InputPanel extends JScrollPane {
                 premiseInput.setEditable(true);
                 theoremInput.setEditable(true);
                 JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
-                        "Records in the proof panel will be clicked",
+                        "Records in the proof panel will be cleared",
                         "Warning",
                         JOptionPane.WARNING_MESSAGE);
                 logic.switchMode();

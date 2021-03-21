@@ -1,14 +1,11 @@
 package storage;
 
-import logic.Language;
 import logic.Logic;
 import logic.exceptions.FilePathException;
 import logic.exceptions.FileReadException;
 import logic.exceptions.TheoremParseException;
-import logic.parser.Parser;
 import model.Inference;
 import model.InferenceRule;
-import model.Proposition;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -83,6 +80,7 @@ public class Storage {
     }
 
     public static void loadFile(String filePath, Logic logic) throws FilePathException, FileReadException {
+        logic.clear();
         File file = new File(filePath);
         Scanner sc;
         try {
@@ -128,7 +126,6 @@ public class Storage {
         }
         int m = sc.nextInt();
         sc.nextLine();
-        logic.clearHistory();
         for (int i = 0; i < m; i++) {
             if (!sc.hasNextLine()) {
                 throw new FileReadException();
@@ -152,5 +149,8 @@ public class Storage {
             logic.insertHistory(new Inference(info[1], info[2], rule));
         }
         logic.updateProposition();
+        if (logic.succeeds() && logic.canModifyDeclaration()) {
+            logic.switchMode();
+        }
     }
 }

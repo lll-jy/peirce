@@ -14,7 +14,7 @@ class GroundLiteral MODEL_COLOR_T4 {
 
 Literal <|-- GroundLiteral
 Literal <|-- CutLiteral
-Proposition "1" -- "*" CutLiteral : enclosing
+Proposition "1" -- "0..1" CutLiteral : enclosing
 Proposition "1" -- "*" Literal : literals
 
 @enduml

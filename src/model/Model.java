@@ -99,6 +99,15 @@ public class Model {
         }
     }
 
+    public void clear() {
+        variables.clear();
+        theorem = new Proposition();
+        theoremString = "";
+        premises.clear();
+        premisesStrings.clear();
+        proposition = new Proposition();
+    }
+
     /**
      * Gets the string of the theorem to prove in the language.
      * @return the string.

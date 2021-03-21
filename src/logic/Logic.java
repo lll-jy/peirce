@@ -29,7 +29,7 @@ public class Logic {
     public static String[] languages = List.of("Coq", "LaTeX").toArray(new String[0]);
     public static Pattern variableRegex = Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*");
     public static Pattern fileNameRegex = Pattern.compile(
-            "((([a-zA-Z0-9_][a-zA-Z0-9_ ]*)|[.][.])[/])*[a-zA-Z0-9_][a-zA-Z0-9_ ]*.txt");
+            "(([a-zA-Z0-9_][a-zA-Z0-9_ ]*)[/])*[a-zA-Z0-9_][a-zA-Z0-9_ ]*.txt");
 
     private final Model model;
     private Language language;
@@ -252,6 +252,11 @@ public class Logic {
     public void clearHistory() {
         history.clear();
         reverseHistory.clear();
+    }
+
+    public void clear() {
+        clearHistory();
+        model.clear();
     }
 
     /**

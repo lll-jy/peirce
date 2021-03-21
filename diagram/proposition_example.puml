@@ -1,0 +1,68 @@
+@startuml
+!include style.puml
+skinparam classAttributeIconSize 0
+skinparam defaultTextAlignment left
+
+object "<color:#white><u>baseProposition:Proposition" as base MODEL_COLOR {
+    <color:#white>-level=0
+    <color:#gray>"[ [ a ] [ [ b [ c ] ] ] ] "
+}
+    object "<color:#white><u>:CutLiteral" as big_frame MODEL_COLOR_T4 {
+        <color:#gray>"[ [ a ] [ [ b [ c ] ] ] ] "
+    }
+    big_frame -- "parent" base
+        object "<color:#white><u>:Proposition" as base_cut MODEL_COLOR {
+            <color:#white>-level=1
+            <color:#gray>"[ a ] [ [ b [ c ] ] ] "
+        }
+        base_cut "content" -- "enclosing frame" big_frame
+            object "<color:#white><u>:CutLiteral" as a_frame MODEL_COLOR_T4 {
+                <color:#gray>"[ a ] "
+            }
+            a_frame -- "parent" base_cut
+                object "<color:#white><u>:Proposition" as a_prop MODEL_COLOR {
+                    <color:#white>-level=2
+                    <color:#gray>"a "
+                }
+                a_prop "content" -- "enclosing frame" a_frame
+                    object "<color:#white><u>a:GroundLiteral" as a MODEL_COLOR_T4 {
+                        <color:#white>-variableName="a"
+                    }
+                    a -- "parent" a_prop
+            object "<color:#white><u>:CutLiteral" as bc_o_frame MODEL_COLOR_T4 {
+                <color:#gray>"[ [ b [ c ] ] ] "
+            }
+            bc_o_frame -- "parent" base_cut
+                object "<color:#white><u>:Proposition" as bc_o_prop MODEL_COLOR {
+                    <color:#white>-level=2
+                    <color:#gray>"[ b [ c ] ] "
+                }
+                bc_o_prop "content" -- "enclosing frame" bc_o_frame
+                    object "<color:#white><u>:CutLiteral" as bc_i_frame MODEL_COLOR_T4 {
+                        <color:#gray>"[ b [ c ] ] "
+                    }
+                    bc_i_frame -- "parent" bc_o_prop
+                        object "<color:#white><u>:Proposition" as bc_i_prop MODEL_COLOR {
+                            <color:#white>-level=3
+                            <color:#gray>"b [ c ] "
+                        }
+                        bc_i_prop "content" -- "enclosing frame" bc_i_frame
+                            object "<color:#white><u>b:GroundLiteral" as b MODEL_COLOR_T4 {
+                                <color:#white>-variableName="b"
+                            }
+                            b -- "parent" bc_i_prop
+                            object "<color:#white><u>:CutLiteral" as c_frame MODEL_COLOR_T4 {
+                                <color:#gray>"[ c ] "
+                            }
+                            c_frame -- "parent" bc_i_prop
+                                object "<color:#white><u>:Proposition" as c_prop MODEL_COLOR {
+                                    <color:#white>-level=4
+                                    <color:#gray>"c"
+                                }
+                                c_prop "content" -- "enclosing frame" c_frame
+                                    object "<color:#white><u>c:GroundLiteral" as c MODEL_COLOR_T4 {
+                                        <color:#white>-variableName="c"
+                                    }
+                                    c -- "parent" c_prop
+
+@enduml
