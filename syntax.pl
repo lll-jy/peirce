@@ -72,7 +72,7 @@ write_file(P):-
 get_structure(S):-
   read_file("Coq",Tokens), !, coq_prop(S,Tokens,[]).
 get_structure(S):-
-  read_file("LeTeX",Tokens), latex_prop(S,Tokens,[]).
+  read_file("LaTeX",Tokens), latex_prop(S,Tokens,[]).
 
 execute:-
   open("prolog/peirce.txt",write,O), write(O,"!!ERROR"), close(O),

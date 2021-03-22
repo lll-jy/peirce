@@ -135,7 +135,10 @@ public class Logic {
     public void switchMode() {
         switch (mode) {
             case DECLARATION -> mode = Mode.PROOF;
-            case PROOF -> mode = Mode.DECLARATION;
+            case PROOF -> {
+                mode = Mode.DECLARATION;
+                model.setProposition(model.getTheorem());
+            }
         }
     }
 

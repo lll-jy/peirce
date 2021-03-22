@@ -300,7 +300,7 @@ public class Proposition {
      */
     public boolean appearsInAncestors(Literal literal) {
         for (Literal l : literals) {
-            if (l.isSameLiteral(literal)) {
+            if (l.isSameLiteral(literal) && l != literal) {
                 return true;
             }
         }

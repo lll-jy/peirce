@@ -76,9 +76,10 @@ public class InputPanel extends JScrollPane {
         constructListPanel("Premise", premiseHeader, premises,
                 premiseInput, i -> {
                     try {
+                        logic.setLanguage((String) langSelector.getSelectedItem());
                         logic.addPremise(i);
                         return true;
-                    } catch (TheoremParseException e) {
+                    } catch (TheoremParseException | FileReadException e) {
                         JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), e.getMessage(),
                                 "Invalid Premise Error", JOptionPane.ERROR_MESSAGE);
                         return false;

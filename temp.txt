@@ -1,6 +1,0 @@
-a 
-Coq
-0
-a->a
-1
-DOUBLE_CUT_INTRO&&[ [ ] ] 

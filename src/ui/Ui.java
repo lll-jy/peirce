@@ -106,7 +106,7 @@ public class Ui {
             "get_structure(S):-\n" +
             "  read_file(\"Coq\",Tokens), !, coq_prop(S,Tokens,[]).\n" +
             "get_structure(S):-\n" +
-            "  read_file(\"LeTeX\",Tokens), latex_prop(S,Tokens,[]).\n" +
+            "  read_file(\"LaTeX\",Tokens), latex_prop(S,Tokens,[]).\n" +
             "\n" +
             "execute:-\n" +
             "  open(\"prolog/peirce.txt\",write,O), write(O,\"!!ERROR\"), close(O),\n" +

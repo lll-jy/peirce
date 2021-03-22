@@ -79,6 +79,13 @@ public class Storage {
         }
     }
 
+    /**
+     * Loads a file from disk and reconstructs the logic component.
+     * @param filePath the path to the file.
+     * @param logic the logic component.
+     * @throws FilePathException if the file path is invalid.
+     * @throws FileReadException if the file format is invalid.
+     */
     public static void loadFile(String filePath, Logic logic) throws FilePathException, FileReadException {
         logic.clear();
         File file = new File(filePath);
