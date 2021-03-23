@@ -148,6 +148,7 @@ public class InputPanel extends JScrollPane {
                         "Records in the proof panel will be cleared",
                         "Warning",
                         JOptionPane.WARNING_MESSAGE);
+                refreshParent.run();
             }
         });
 

@@ -1,4 +1,4 @@
-LaTeX
+Coq
 a
-\land
+->
 b

@@ -35,14 +35,11 @@ public class ProofPanel extends JPanel {
     private final Logic logic;
     private final JLabel goalDisplay;
     private final JTextArea theoremDisplay;
-    private final JButton addDoubleCutBtn;
-    private final JButton removeDoubleCutBtn;
-    private final JButton undoBtn;
-    private final JButton redoBtn;
     private final JLabel resultDisplay;
     private final JPanel historyPanel;
     private final Clipboard clipboard;
     private final List<JLabel> historyLabels;
+    private final List<JButton> buttons;
 
     /**
      * Constructs the proof panel.
@@ -52,6 +49,7 @@ public class ProofPanel extends JPanel {
         super();
         this.logic = logic;
         this.clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        this.buttons = new ArrayList<>();
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -59,12 +57,10 @@ public class ProofPanel extends JPanel {
         goalDisplay = new JLabel(String.format("Goal: %s", logic.getTheorem()));
         goalPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
         goalPanel.add(goalDisplay);
-        add(goalPanel);
 
         JPanel labelPanel = new JPanel();
         labelPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
         labelPanel.add(new JLabel("Current Proposition:"));
-        add(labelPanel);
 
         JPanel workPanel = new JPanel();
         workPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
@@ -123,22 +119,21 @@ public class ProofPanel extends JPanel {
             public void keyReleased(KeyEvent e) {
             }
         });
-        theoremDisplay.setPreferredSize(new Dimension(530, 100));
+        theoremDisplay.setPreferredSize(new Dimension(500, 25));
         workPanel.add(theoremDisplay);
         JPanel btnPanel = new JPanel();
-        btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.Y_AXIS));;
-        Icon icon1 = new ImageIcon(new ImageIcon(DC_IMG).getImage()
+        btnPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+        Icon dciTxtIcon = new ImageIcon(new ImageIcon(DC_IMG).getImage()
                         .getScaledInstance(25,25, Image.SCALE_SMOOTH));
-        addDoubleCutBtn = new JButton(icon1);
-        addDoubleCutBtn.setEnabled(false);
+        JButton addDoubleCutBtn = new JButton(dciTxtIcon);
+        buttons.add(addDoubleCutBtn);
         btnPanel.add(addDoubleCutBtn);
-        Icon icon2 = new ImageIcon(new ImageIcon(RDC_IMG).getImage()
+        Icon dceTxtIcon = new ImageIcon(new ImageIcon(RDC_IMG).getImage()
                 .getScaledInstance(25,25,Image.SCALE_SMOOTH));
-        removeDoubleCutBtn = new JButton(icon2);
-        removeDoubleCutBtn.setEnabled(false);
+        JButton removeDoubleCutBtn = new JButton(dceTxtIcon);
+        buttons.add(removeDoubleCutBtn);
         btnPanel.add(removeDoubleCutBtn);
         workPanel.add(btnPanel);
-        add(workPanel);
 
         JPanel resultPanel = new JPanel();
         resultPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
@@ -168,7 +163,6 @@ public class ProofPanel extends JPanel {
         });
         addDoubleCutBtn.setToolTipText("Double Cut Introduction");
         removeDoubleCutBtn.setToolTipText("Double Cut Elimination");
-        add(resultPanel);
 
         JPanel helperToolPanel = new JPanel();
         helperToolPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
@@ -179,7 +173,7 @@ public class ProofPanel extends JPanel {
         historyPane.setPreferredSize(new Dimension(400, 355));
         helperToolPanel.add(historyPane);
         historyLabels = new ArrayList<>();
-        undoBtn = new JButton("Undo");
+        JButton undoBtn = new JButton("Undo");
         undoBtn.addActionListener(e -> {
             try {
                 logic.undo();
@@ -197,9 +191,9 @@ public class ProofPanel extends JPanel {
                 displayError(err);
             }
         });
-        undoBtn.setEnabled(false);
+        buttons.add(undoBtn);
         labelPanel.add(undoBtn);
-        redoBtn = new JButton("Redo");
+        JButton redoBtn = new JButton("Redo");
         redoBtn.addActionListener(e -> {
             try {
                 Inference inference = logic.redo();
@@ -217,7 +211,7 @@ public class ProofPanel extends JPanel {
                 displayError(err);
             }
         });
-        redoBtn.setEnabled(false);
+        buttons.add(redoBtn);
         labelPanel.add(redoBtn);
         JPanel draftPanel = new JPanel();
         draftPanel.setLayout(new BoxLayout(draftPanel, BoxLayout.Y_AXIS));
@@ -232,7 +226,44 @@ public class ProofPanel extends JPanel {
         roughWorkArea.setPreferredSize(new Dimension(160, 300));
         draftPanel.add(roughWorkArea);
         helperToolPanel.add(draftPanel);
+
+        JPanel drawHeader = new JPanel();
+        drawHeader.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+        drawHeader.add(new JLabel("Graph: "));
+        JButton copyBtn = new JButton("Copy");
+        JButton cutBtn = new JButton("Cut");
+        JButton pasteBtn = new JButton("Paste");
+        Icon dciDiagramIcon = new ImageIcon(new ImageIcon(DC_IMG).getImage()
+                .getScaledInstance(18,18, Image.SCALE_SMOOTH));
+        Icon dceDiagramIcon = new ImageIcon(new ImageIcon(RDC_IMG).getImage()
+                .getScaledInstance(18,18, Image.SCALE_SMOOTH));
+        JButton dciBtn = new JButton(dciDiagramIcon);
+        JButton dceBtn = new JButton(dceDiagramIcon);
+        buttons.add(copyBtn);
+        buttons.add(cutBtn);
+        buttons.add(pasteBtn);
+        buttons.add(dciBtn);
+        buttons.add(dceBtn);
+        drawHeader.add(copyBtn);
+        drawHeader.add(cutBtn);
+        drawHeader.add(pasteBtn);
+        drawHeader.add(dciBtn);
+        drawHeader.add(dceBtn);
+        dciBtn.setToolTipText("Wrap with double cut");
+        dceBtn.setToolTipText("Remove outer double cut");
+
+        JPanel diagramPanel = new JPanel();
+        diagramPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+
+        add(goalPanel);
+        add(labelPanel);
+        add(workPanel);
+        add(drawHeader);
+        add(resultPanel);
         add(helperToolPanel);
+        for (JButton b : buttons) {
+            b.setEnabled(false);
+        }
     }
 
     /**
@@ -241,10 +272,10 @@ public class ProofPanel extends JPanel {
     public void refresh() {
         revalidate();
         repaint();
-        addDoubleCutBtn.setEnabled(true);
-        removeDoubleCutBtn.setEnabled(true);
-        undoBtn.setEnabled(true);
-        redoBtn.setEnabled(true);
+        boolean proofEditable = !logic.canModifyDeclaration();
+        for (JButton b : buttons) {
+            b.setEnabled(proofEditable);
+        }
         goalDisplay.setText(String.format("Goal: %s", logic.getTheorem()));
         theoremDisplay.setText(logic.getProposition().toString());
         resultDisplay.setText("");
@@ -264,15 +295,16 @@ public class ProofPanel extends JPanel {
      */
     private void checkSuccess() {
         if (logic.succeeds()) {
+            for (JButton b : buttons) {
+                b.setEnabled(false);
+            }
+            historyPanel.add(new JLabel("Q.E.D."));
+            historyPanel.revalidate();
+            historyPanel.repaint();
             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
                     "Congratulations! Proof succeeded!",
                     "Success Notice",
                     JOptionPane.INFORMATION_MESSAGE);
-            addDoubleCutBtn.setEnabled(false);
-            removeDoubleCutBtn.setEnabled(false);
-            undoBtn.setEnabled(false);
-            redoBtn.setEnabled(false);
-            historyPanel.add(new JLabel("Q.E.D."));
         }
     }
 
