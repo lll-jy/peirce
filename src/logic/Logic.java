@@ -341,6 +341,7 @@ public class Logic {
         } else {
             for (Literal l : literals) {
                 l.increaseLevelBy(2);
+                l.setParent(inner);
             }
             inner.addLiterals(literals);
             parent.replaceLiterals(literals, newLiterals);
@@ -407,7 +408,7 @@ public class Logic {
             }
             l.setParent(parent);
         }
-        prop.increaseLevelBy(parent.getLevel() + 1);
+        prop.increaseLevelBy(parent.getLevel());
         parent.insertLiterals(pos, prop.getLiterals());
         String to = getProposition().toString();
         if (insertionApplied) {
