@@ -7,6 +7,7 @@ import logic.exceptions.RedoException;
 import logic.exceptions.TheoremParseException;
 import logic.exceptions.UndoException;
 import model.Inference;
+import model.Proposition;
 import static ui.Ui.DC_IMG;
 import static ui.Ui.RDC_IMG;
 
@@ -111,7 +112,7 @@ public class ProofPanel extends JPanel {
         historyPanel.setLayout(new BoxLayout(historyPanel, BoxLayout.Y_AXIS));
         JScrollPane historyPane = new JScrollPane(historyPanel);
         historyPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        historyPane.setPreferredSize(new Dimension(400, 355));
+        historyPane.setPreferredSize(new Dimension(400, 255));
         helperToolPanel.add(historyPane);
         historyLabels = new ArrayList<>();
         JButton undoBtn = new JButton("Undo");
@@ -120,19 +121,19 @@ public class ProofPanel extends JPanel {
         JButton redoBtn = new JButton("Redo");
         buttons.add(redoBtn);
         labelPanel.add(redoBtn);
-        JPanel draftPanel = new JPanel();
-        draftPanel.setLayout(new BoxLayout(draftPanel, BoxLayout.Y_AXIS));
+        JPanel draftTxtPanel = new JPanel();
+        draftTxtPanel.setLayout(new BoxLayout(draftTxtPanel, BoxLayout.Y_AXIS));
         JPanel draftLabelPanel = new JPanel();
         draftLabelPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
         draftLabelPanel.add(new JLabel("<html>You may do some <br/>rough work here:</html>"));
-        draftPanel.add(draftLabelPanel);
+        draftTxtPanel.add(draftLabelPanel);
         JTextArea roughWorkArea = new JTextArea();
         roughWorkArea.setLineWrap(true);
         roughWorkArea.setAutoscrolls(true);
         roughWorkArea.setMargin(new Insets(5, 5, 5, 5));
-        roughWorkArea.setPreferredSize(new Dimension(160, 300));
-        draftPanel.add(roughWorkArea);
-        helperToolPanel.add(draftPanel);
+        roughWorkArea.setPreferredSize(new Dimension(160, 200));
+        draftTxtPanel.add(roughWorkArea);
+        helperToolPanel.add(draftTxtPanel);
 
         JPanel drawHeader = new JPanel();
         drawHeader.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
@@ -159,10 +160,29 @@ public class ProofPanel extends JPanel {
         dciBtn.setToolTipText("Wrap with double cut");
         dceBtn.setToolTipText("Remove outer double cut");
 
+        // TODO: draw
         JPanel diagramPanel = new JPanel();
         diagramPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
-        currentDiagram = new DiagramPanel("Current Diagram", logic.getProposition());
+        currentDiagram = new DiagramPanel("Current Diagram: ",
+                logic.getProposition(), 300, 150);
         diagramPanel.add(currentDiagram);
+        JPanel draftPanel = new JPanel();
+        draftPanel.setLayout(new BoxLayout(draftPanel, BoxLayout.Y_AXIS));
+        JPanel draftHeaderPanel = new JPanel();
+        draftHeaderPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
+        draftHeaderPanel.add(new JLabel("Draft:"));
+        JButton drawDraftBtn = new JButton("Draw");
+        draftHeaderPanel.add(drawDraftBtn);
+        draftPanel.add(draftHeaderPanel);
+        JTextArea draftInput = new JTextArea();
+        draftInput.setLineWrap(true);
+        draftInput.setAutoscrolls(true);
+        draftInput.setMargin(new Insets(5, 5, 5, 5));
+        draftInput.setPreferredSize(new Dimension(280, 45));
+        draftPanel.add(draftInput);
+        DiagramPanel draftDiagram = new DiagramPanel("Draft Diagram: ", new Proposition(), 280, 100);
+        draftPanel.add(draftDiagram);
+        diagramPanel.add(draftPanel);
 
         undoBtn.addActionListener(e -> {
             try {
@@ -263,13 +283,15 @@ public class ProofPanel extends JPanel {
             public void keyReleased(KeyEvent e) {
             }
         });
+        drawDraftBtn.addActionListener(e -> {
 
+        });
 
-        add(goalPanel);
         add(labelPanel);
         add(workPanel);
         add(drawHeader);
         add(diagramPanel);
+        add(goalPanel);
         add(resultPanel);
         add(helperToolPanel);
         for (JButton b : buttons) {
