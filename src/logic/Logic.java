@@ -37,6 +37,8 @@ public class Logic {
     private final Stack<Inference> history;
     private final Stack<Inference> reverseHistory;
     private String filePath;
+    private String theoremString;
+    private final List<String> premiseStrings;
 
     /**
      * Initializes a Logic component based on the model, and initially the default language is Coq, and
@@ -50,6 +52,7 @@ public class Logic {
         this.history = new Stack<>();
         this.reverseHistory = new Stack<>();
         this.filePath = "theorem.txt";
+        this.premiseStrings = new ArrayList<>();
     }
 
     /**
@@ -78,7 +81,8 @@ public class Logic {
      */
     public void addPremise(String str) throws TheoremParseException {
         Proposition prop = parse(str);
-        model.insertPremise(str, prop);
+        premiseStrings.add(str);
+        model.insertPremise(prop);
     }
 
     /**
@@ -102,7 +106,9 @@ public class Logic {
      * @param str the string representing the premise.
      */
     public void deletePremise(String str) {
-        model.removePremise(str);
+        int index = premiseStrings.indexOf(str);
+        premiseStrings.remove(index);
+        model.removePremise(index);
     }
 
     /**
@@ -118,7 +124,7 @@ public class Logic {
      * @return the list of premises.
      */
     public List<String> getPremises() {
-        return model.getPremisesStrings();
+        return premiseStrings;
     }
 
     /**
@@ -139,7 +145,6 @@ public class Logic {
                 mode = Mode.DECLARATION;
                 List<Proposition> premises = model.getPremises();
                 premises.clear();
-                List<String> premiseStrings = model.getPremisesStrings();
                 for (String premise : premiseStrings) {
                     try {
                         premises.add(parse(premise));
@@ -198,7 +203,8 @@ public class Logic {
      * @throws TheoremParseException if the string representing the theorem is not parsable in the language.
      */
     public void setTheorem(String theorem) throws TheoremParseException {
-        model.setTheorem(theorem, parse(theorem));
+        theoremString = theorem;
+        model.setTheorem(parse(theorem));
     }
 
     /**
@@ -206,7 +212,7 @@ public class Logic {
      * @return the string of the theorem written in the language chosen.
      */
     public String getTheoremString() {
-        return model.getTheoremString();
+        return theoremString;
     }
 
     /**
@@ -279,6 +285,8 @@ public class Logic {
 
     public void clear() {
         clearHistory();
+        premiseStrings.clear();
+        theoremString = "";
         model.clear();
     }
 

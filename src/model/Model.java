@@ -9,9 +9,7 @@ import java.util.List;
  */
 public class Model {
     private final List<String> variables;
-    private final List<String> premisesStrings;
     private final List<Proposition> premises;
-    private String theoremString;
     private Proposition theorem;
     private Proposition proposition;
 
@@ -20,7 +18,6 @@ public class Model {
      */
     public Model() {
         variables = new ArrayList<>();
-        premisesStrings = new ArrayList<>();
         premises = new ArrayList<>();
         theorem = new Proposition();
         proposition = new Proposition();
@@ -41,14 +38,6 @@ public class Model {
     public void setVariables(List<String> variables) {
         this.variables.clear();
         this.variables.addAll(variables);
-    }
-
-    /**
-     * Gets the list of premises recognizable in this model.
-     * @return the list of premises in the input string format.
-     */
-    public List<String> getPremisesStrings() {
-        return premisesStrings;
     }
 
     /**
@@ -87,8 +76,7 @@ public class Model {
      * Sets the theorem to the given new proposition.
      * @param theorem the new proposition.
      */
-    public void setTheorem(String str, Proposition theorem) {
-        this.theoremString = str;
+    public void setTheorem(Proposition theorem) {
         this.theorem = theorem;
         proposition = new Proposition();
         for (Proposition premise : premises) {
@@ -102,18 +90,8 @@ public class Model {
     public void clear() {
         variables.clear();
         theorem = new Proposition();
-        theoremString = "";
         premises.clear();
-        premisesStrings.clear();
         proposition = new Proposition();
-    }
-
-    /**
-     * Gets the string of the theorem to prove in the language.
-     * @return the string.
-     */
-    public String getTheoremString() {
-        return theoremString;
     }
 
     /**
@@ -134,21 +112,17 @@ public class Model {
 
     /**
      * Adds a new premise.
-     * @param str the premise string want to be added.
      * @param prop the constructed proposition corresponding to the premise.
      */
-    public void insertPremise(String str, Proposition prop) {
-        premisesStrings.add(str);
+    public void insertPremise(Proposition prop) {
         premises.add(prop);
     }
 
     /**
      * Removes a particular premise.
-     * @param premise the string of the premise to be removed.
+     * @param index the index the premise to be removed.
      */
-    public void removePremise(String premise) {
-        int index = premisesStrings.indexOf(premise);
-        premisesStrings.remove(index);
+    public void removePremise(int index) {
         premises.remove(index);
     }
 
