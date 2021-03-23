@@ -117,6 +117,9 @@ public class Ui {
             ":-halt.";
 
     private final JFrame frame;
+    private JMenuBar menuBar;
+    private InputPanel inputPanel;
+    private JPanel panel;
 
     /**
      * Initialize a UI frame of Peirce Alpha Proof Assistant.
@@ -131,44 +134,44 @@ public class Ui {
      */
     public void construct(Logic logic) {
         // File creation
-        for (String s : directories) {
-            try {
-                Storage.createDirectory(String.format("%s/", s));
-            } catch (Exception e) {
-                assert false;
-            }
-        }
-        getImage("https://i.ibb.co/7Xzf5Pd/double-cut.png", DC_IMG);
-        getImage("https://i.ibb.co/qp4vmzW/remove-double-cut.png", RDC_IMG);
-        try {
-            FileWriter fw = new FileWriter(SYNTAX_PL);
-            fw.write(prologContent);
-            fw.close();
-        } catch (IOException e) {
-            assert false;
-        }
+        fileCreation();
 
         // Frame creation
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Panel setup
+        panelSetup(logic);
+
+        // Frame building
+        buildFrame();
+    }
+
+    /**
+     * Fill the panels.
+     * @param logic the logic component of the application.
+     */
+    private void panelSetup(Logic logic) {
         ProofPanel proofPanel = new ProofPanel(logic);
-        JPanel panel = new JPanel();
-        InputPanel inputPanel = new InputPanel(logic);
+        panel = new JPanel();
+        inputPanel = new InputPanel(logic);
         Runnable refresh = () -> {
             panel.revalidate();
             panel.repaint();
             proofPanel.refresh();
         };
         inputPanel.setRefresh(refresh);
-        JMenuBar menuBar = new MenuBar(logic, () -> {
+        menuBar = new MenuBar(logic, () -> {
             inputPanel.refresh();
             refresh.run();
         });
 
         panel.add(proofPanel);
+    }
 
-        // Frame building
+    /**
+     * Initializes frame properties.
+     */
+    private void buildFrame() {
         frame.setVisible(true);
         frame.setJMenuBar(menuBar);
         frame.getContentPane().add(panel);
@@ -185,6 +188,28 @@ public class Ui {
                 }
             }
         });
+    }
+
+    /**
+     * Creates files needed for running the applciation.
+     */
+    private void fileCreation() {
+        for (String s : directories) {
+            try {
+                Storage.createDirectory(String.format("%s/", s));
+            } catch (Exception e) {
+                assert false;
+            }
+        }
+        getImage("https://i.ibb.co/7Xzf5Pd/double-cut.png", DC_IMG);
+        getImage("https://i.ibb.co/qp4vmzW/remove-double-cut.png", RDC_IMG);
+        try {
+            FileWriter fw = new FileWriter(SYNTAX_PL);
+            fw.write(prologContent);
+            fw.close();
+        } catch (IOException e) {
+            assert false;
+        }
     }
 
     // Reference: https://stackoverflow.com/questions/10292792/getting-image-from-url-java/26234404

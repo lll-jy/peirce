@@ -1,6 +1,7 @@
 package ui;
 
 import model.Proposition;
+import ui.diagram.PropositionDiagram;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +10,7 @@ public class DiagramPanel extends JPanel {
     private Proposition proposition;
     private final JPanel canvasPanel;
     private boolean isSelectMode;
-    private PeirceDiagram diagram;
+    private PropositionDiagram diagram;
 
     public DiagramPanel(String title, Proposition proposition, int width, int height) {
         super();
@@ -33,7 +34,7 @@ public class DiagramPanel extends JPanel {
 
     private void constructDiagram() {
         canvasPanel.removeAll();
-        diagram = new PeirceDiagram(proposition);
+        diagram = new PropositionDiagram(proposition);
         canvasPanel.add(diagram);
         canvasPanel.revalidate();
         canvasPanel.repaint();
