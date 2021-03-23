@@ -141,6 +141,7 @@ public class ProofPanel extends JPanel {
         JPanel drawHeader = new JPanel();
         drawHeader.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
         drawHeader.add(new JLabel("Graph: "));
+        JButton selectBtn = new JButton("Select");
         JButton copyBtn = new JButton("Copy");
         JButton cutBtn = new JButton("Cut");
         JButton pasteBtn = new JButton("Paste");
@@ -150,11 +151,13 @@ public class ProofPanel extends JPanel {
                 .getScaledInstance(18,18, Image.SCALE_SMOOTH));
         JButton dciBtn = new JButton(dciDiagramIcon);
         JButton dceBtn = new JButton(dceDiagramIcon);
+        buttons.add(selectBtn);
         buttons.add(copyBtn);
         buttons.add(cutBtn);
         buttons.add(pasteBtn);
         buttons.add(dciBtn);
         buttons.add(dceBtn);
+        drawHeader.add(selectBtn);
         drawHeader.add(copyBtn);
         drawHeader.add(cutBtn);
         drawHeader.add(pasteBtn);
@@ -308,6 +311,9 @@ public class ProofPanel extends JPanel {
             } catch (TheoremParseException tpe) {
                 displayError(tpe);
             }
+        });
+        selectBtn.addActionListener(e -> {
+            currentDiagram.setSelectMode(!currentDiagram.isSelectMode());
         });
 
         add(labelPanel);

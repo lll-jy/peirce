@@ -8,10 +8,13 @@ import java.awt.*;
 public class DiagramPanel extends JPanel {
     private Proposition proposition;
     private final JPanel canvasPanel;
+    private boolean isSelectMode;
+    private PeirceDiagram diagram;
 
     public DiagramPanel(String title, Proposition proposition, int width, int height) {
         super();
         this.proposition = proposition;
+        isSelectMode = false;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         JPanel labelPanel = new JPanel();
@@ -30,7 +33,7 @@ public class DiagramPanel extends JPanel {
 
     private void constructDiagram() {
         canvasPanel.removeAll();
-        PeirceDiagram diagram = new PeirceDiagram(proposition);
+        diagram = new PeirceDiagram(proposition);
         canvasPanel.add(diagram);
         canvasPanel.revalidate();
         canvasPanel.repaint();
@@ -39,5 +42,14 @@ public class DiagramPanel extends JPanel {
     public void refresh(Proposition proposition) {
         this.proposition = proposition;
         constructDiagram();
+    }
+
+    public void setSelectMode(boolean mode) {
+        isSelectMode = mode;
+        diagram.setSelectMode(mode);
+    }
+
+    public boolean isSelectMode() {
+        return isSelectMode;
     }
 }
