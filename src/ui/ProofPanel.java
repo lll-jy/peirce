@@ -33,12 +33,15 @@ import java.util.List;
  * The panel that the user constructs the reasoning for proof.
  */
 public class ProofPanel extends JPanel {
+    private static final int resultDisplayLength = 55;
+
     private final Logic logic;
     private final JLabel goalDisplay;
     private final JTextArea theoremDisplay;
     private final JLabel resultDisplay;
     private final JPanel historyPanel;
     private final DiagramPanel currentDiagram;
+    private final DiagramPanel goalDiagram;
     private final Clipboard clipboard;
     private final List<JLabel> historyLabels;
     private final List<JButton> buttons;
@@ -160,7 +163,6 @@ public class ProofPanel extends JPanel {
         dciBtn.setToolTipText("Wrap with double cut");
         dceBtn.setToolTipText("Remove outer double cut");
 
-        // TODO: draw
         JPanel diagramPanel = new JPanel();
         diagramPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
         currentDiagram = new DiagramPanel("Current Diagram: ",
@@ -184,6 +186,22 @@ public class ProofPanel extends JPanel {
         DiagramPanel draftDiagram = new DiagramPanel("Draft Diagram: ", new Proposition(), 180, 140);
         draftPanel.add(draftDiagram);
         diagramPanel.add(draftPanel);
+
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
+        JPanel textInfoPanel = new JPanel();
+        textInfoPanel.setLayout(new BoxLayout(textInfoPanel, BoxLayout.Y_AXIS));
+        textInfoPanel.setPreferredSize(new Dimension(300, 170));
+        textInfoPanel.add(goalPanel);
+        textInfoPanel.add(historyPane);
+        JPanel graphInfoPanel = new JPanel();
+        graphInfoPanel.setLayout(new BoxLayout(graphInfoPanel, BoxLayout.Y_AXIS));
+        graphInfoPanel.setPreferredSize(new Dimension(280, 170));
+        goalDiagram = new DiagramPanel("Goal diagram: ", logic.getTheorem(), 280, 100);
+        graphInfoPanel.add(goalDiagram);
+        graphInfoPanel.add(resultPanel);
+        infoPanel.add(textInfoPanel);
+        infoPanel.add(graphInfoPanel);
 
         undoBtn.addActionListener(e -> {
             try {
@@ -227,7 +245,6 @@ public class ProofPanel extends JPanel {
                 int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
                 logic.addDoubleCut(start, end);
                 updateResult();
-                currentDiagram.refresh(logic.getProposition());
                 checkSuccess();
             } catch (InvalidSelectionException err) {
                 displayError(err);
@@ -239,7 +256,6 @@ public class ProofPanel extends JPanel {
                 int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
                 logic.removeDoubleCut(start, end);
                 updateResult();
-                currentDiagram.refresh(logic.getProposition());
                 checkSuccess();
             } catch (InvalidSelectionException | InvalidInferenceException err) {
                 displayError(err);
@@ -276,7 +292,6 @@ public class ProofPanel extends JPanel {
                         displayError(err);
                     }
                 }
-                currentDiagram.refresh(logic.getProposition());
                 checkSuccess();
             }
 
@@ -299,9 +314,7 @@ public class ProofPanel extends JPanel {
         add(workPanel);
         add(drawHeader);
         add(diagramPanel);
-        add(goalPanel);
-        add(resultPanel);
-        add(helperToolPanel);
+        add(infoPanel);
         for (JButton b : buttons) {
             b.setEnabled(false);
         }
@@ -324,6 +337,7 @@ public class ProofPanel extends JPanel {
         historyPanel.removeAll();
         historyLabels.clear();
         currentDiagram.refresh(logic.getProposition());
+        goalDiagram.refresh(logic.getTheorem());
         for (Inference i : logic.getHistory()) {
             JLabel l = new JLabel(i.userDisplay());
             historyLabels.add(l);
@@ -355,11 +369,24 @@ public class ProofPanel extends JPanel {
      */
     private void updateResult() {
         theoremDisplay.setText(logic.getProposition().toString());
-        resultDisplay.setText(logic.getLastLog());
+        String lastLog = logic.getLastLog();
+        StringBuilder result = new StringBuilder();
+        while (lastLog.length() > resultDisplayLength) {
+            String substring = lastLog.substring(0, resultDisplayLength);
+            result.append(substring);
+            result.append("<br/>");
+            lastLog = lastLog.substring(resultDisplayLength);
+        }
+        result.append(lastLog);
+        resultDisplay.setText(String.format("<html>%s</html>", result));
         resultDisplay.setForeground(Color.BLACK);
         JLabel logResult = new JLabel(logic.getLastLog());
         historyLabels.add(logResult);
         historyPanel.add(logResult);
+        historyPanel.revalidate();
+        historyPanel.repaint();
+        currentDiagram.refresh(logic.getProposition());
+        goalDiagram.refresh(logic.getTheorem());
     }
 
     /**
