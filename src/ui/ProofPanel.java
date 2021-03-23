@@ -164,7 +164,7 @@ public class ProofPanel extends JPanel {
         JPanel diagramPanel = new JPanel();
         diagramPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
         currentDiagram = new DiagramPanel("Current Diagram: ",
-                logic.getProposition(), 300, 150);
+                logic.getProposition(), 400, 220);
         diagramPanel.add(currentDiagram);
         JPanel draftPanel = new JPanel();
         draftPanel.setLayout(new BoxLayout(draftPanel, BoxLayout.Y_AXIS));
@@ -172,15 +172,16 @@ public class ProofPanel extends JPanel {
         draftHeaderPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
         draftHeaderPanel.add(new JLabel("Draft:"));
         JButton drawDraftBtn = new JButton("Draw");
+        drawDraftBtn.setToolTipText("Convert the canonical diagram string to diagram");
         draftHeaderPanel.add(drawDraftBtn);
         draftPanel.add(draftHeaderPanel);
         JTextArea draftInput = new JTextArea();
         draftInput.setLineWrap(true);
         draftInput.setAutoscrolls(true);
         draftInput.setMargin(new Insets(5, 5, 5, 5));
-        draftInput.setPreferredSize(new Dimension(280, 45));
+        draftInput.setPreferredSize(new Dimension(180, 45));
         draftPanel.add(draftInput);
-        DiagramPanel draftDiagram = new DiagramPanel("Draft Diagram: ", new Proposition(), 280, 100);
+        DiagramPanel draftDiagram = new DiagramPanel("Draft Diagram: ", new Proposition(), 180, 140);
         draftPanel.add(draftDiagram);
         diagramPanel.add(draftPanel);
 
@@ -284,7 +285,14 @@ public class ProofPanel extends JPanel {
             }
         });
         drawDraftBtn.addActionListener(e -> {
-
+            String diagramCanonical = draftInput.getText();
+            try {
+                Proposition draftProp = logic.parseFrame(diagramCanonical);
+                draftDiagram.refresh(draftProp);
+                resultDisplay.setText("");
+            } catch (TheoremParseException tpe) {
+                displayError(tpe);
+            }
         });
 
         add(labelPanel);

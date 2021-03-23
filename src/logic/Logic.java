@@ -183,6 +183,16 @@ public class Logic {
     }
 
     /**
+     * Parses a string of canonical diagram expression to a proposition structure.
+     * @param diagram the canonical diagram string.
+     * @return the Proposition corresponding to the diagram.
+     * @throws TheoremParseException if the input diagram is invalid.
+     */
+    public Proposition parseFrame(String diagram) throws TheoremParseException {
+        return Parser.createParser(getLanguage(), getVariables()).parseFrame(diagram);
+    }
+
+    /**
      * Sets the theorem to prove in this logic instance.
      * @param theorem the new proposition.
      * @throws TheoremParseException if the string representing the theorem is not parsable in the language.
@@ -396,7 +406,7 @@ public class Logic {
     public void paste(int pos, String str) throws TheoremParseException,
             InvalidSelectionException, InvalidInferenceException {
         String from = getProposition().toString();
-        Proposition prop = Parser.createParser(language, getVariables()).parseFrame(str);
+        Proposition prop = parseFrame(str);
         Proposition parent = getCursorProp(pos);
         boolean insertionApplied = false;
         boolean iterationApplied = false;
