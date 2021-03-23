@@ -54,9 +54,10 @@ public class Card extends JPanel {
 
     /**
      * Switches editable mode of the card.
+     * @param isEditable the new editable mode.
      */
-    public void switchEditable() {
-        isEditable = !isEditable;
+    public void setEditable(boolean isEditable) {
+        this.isEditable = isEditable;
         editBtn.setEnabled(isEditable);
         deleteBtn.setEnabled(isEditable);
     }

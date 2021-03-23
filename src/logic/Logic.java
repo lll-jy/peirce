@@ -137,7 +137,17 @@ public class Logic {
             case DECLARATION -> mode = Mode.PROOF;
             case PROOF -> {
                 mode = Mode.DECLARATION;
-                model.setProposition(model.getTheorem());
+                List<Proposition> premises = model.getPremises();
+                premises.clear();
+                List<String> premiseStrings = model.getPremisesStrings();
+                for (String premise : premiseStrings) {
+                    try {
+                        premises.add(parse(premise));
+                    } catch (TheoremParseException e) {
+                        assert false;
+                    }
+                }
+                model.resetProposition();
             }
         }
     }

@@ -151,4 +151,14 @@ public class Model {
         premisesStrings.remove(index);
         premises.remove(index);
     }
+
+    public void resetProposition() {
+        proposition = new Proposition();
+        for (Proposition p : premises) {
+            for (Literal l : p.getLiterals()) {
+                proposition.addLiteral(l);
+                l.setParent(proposition);
+            }
+        }
+    }
 }
