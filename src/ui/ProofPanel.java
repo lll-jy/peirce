@@ -37,6 +37,7 @@ public class ProofPanel extends JPanel {
     private final JTextArea theoremDisplay;
     private final JLabel resultDisplay;
     private final JPanel historyPanel;
+    private final JPanel currentDiagram;
     private final Clipboard clipboard;
     private final List<JLabel> historyLabels;
     private final List<JButton> buttons;
@@ -254,11 +255,16 @@ public class ProofPanel extends JPanel {
 
         JPanel diagramPanel = new JPanel();
         diagramPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+        currentDiagram = new JPanel();
+        diagramPanel.add(currentDiagram);
+        currentDiagram.add(new PeirceDiagram(logic.getProposition()));
+        currentDiagram.setBackground(Color.WHITE);
 
         add(goalPanel);
         add(labelPanel);
         add(workPanel);
         add(drawHeader);
+        add(diagramPanel);
         add(resultPanel);
         add(helperToolPanel);
         for (JButton b : buttons) {
@@ -282,6 +288,8 @@ public class ProofPanel extends JPanel {
         resultDisplay.setForeground(Color.BLACK);
         historyPanel.removeAll();
         historyLabels.clear();
+        currentDiagram.removeAll();
+        currentDiagram.add(new PeirceDiagram(logic.getProposition()));
         for (Inference i : logic.getHistory()) {
             JLabel l = new JLabel(i.userDisplay());
             historyLabels.add(l);
