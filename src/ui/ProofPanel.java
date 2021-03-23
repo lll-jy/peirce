@@ -37,7 +37,7 @@ public class ProofPanel extends JPanel {
     private final JTextArea theoremDisplay;
     private final JLabel resultDisplay;
     private final JPanel historyPanel;
-    private final JPanel currentDiagram;
+    private final DiagramPanel currentDiagram;
     private final Clipboard clipboard;
     private final List<JLabel> historyLabels;
     private final List<JButton> buttons;
@@ -82,44 +82,6 @@ public class ProofPanel extends JPanel {
                 super.focusLost(e);
             }
         });
-        theoremDisplay.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_X && e.isControlDown()) {
-                    try {
-                        int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
-                        int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
-                        logic.cut(start, end);
-                        updateResult();
-                    } catch (InvalidSelectionException | InvalidInferenceException err) {
-                        displayError(err);
-                    }
-                } else if (e.getKeyCode() == KeyEvent.VK_V && e.isControlDown()) {
-                    try {
-                        int pos = logic.getTokenIndex(theoremDisplay.getSelectionStart());
-                        if (pos != logic.getTokenIndex(theoremDisplay.getSelectionEnd())) {
-                            throw new InvalidSelectionException("Please place your cursor in a deterministic " +
-                                    "position to insert new propositions.");
-                        }
-                        String toInsert = clipboard.getData(DataFlavor.stringFlavor).toString();
-                        logic.paste(pos, toInsert);
-                        updateResult();
-                    } catch (InvalidSelectionException | InvalidInferenceException | TheoremParseException |
-                            UnsupportedFlavorException | IOException err) {
-                        displayError(err);
-                    }
-                }
-                checkSuccess();
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-            }
-        });
         theoremDisplay.setPreferredSize(new Dimension(500, 25));
         workPanel.add(theoremDisplay);
         JPanel btnPanel = new JPanel();
@@ -140,28 +102,6 @@ public class ProofPanel extends JPanel {
         resultPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
         resultDisplay = new JLabel();
         resultPanel.add(resultDisplay);
-        addDoubleCutBtn.addActionListener(e -> {
-            try {
-                int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
-                int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
-                logic.addDoubleCut(start, end);
-                updateResult();
-                checkSuccess();
-            } catch (InvalidSelectionException err) {
-                displayError(err);
-            }
-        });
-        removeDoubleCutBtn.addActionListener(e -> {
-            try {
-                int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
-                int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
-                logic.removeDoubleCut(start, end);
-                updateResult();
-                checkSuccess();
-            } catch (InvalidSelectionException | InvalidInferenceException err) {
-                displayError(err);
-            }
-        });
         addDoubleCutBtn.setToolTipText("Double Cut Introduction");
         removeDoubleCutBtn.setToolTipText("Double Cut Elimination");
 
@@ -175,43 +115,9 @@ public class ProofPanel extends JPanel {
         helperToolPanel.add(historyPane);
         historyLabels = new ArrayList<>();
         JButton undoBtn = new JButton("Undo");
-        undoBtn.addActionListener(e -> {
-            try {
-                logic.undo();
-                historyPanel.removeAll();
-                historyLabels.remove(historyLabels.size() - 1);
-                for (JLabel l : historyLabels) {
-                    historyPanel.add(l);
-                }
-                theoremDisplay.setText(logic.getProposition().toString());
-                resultDisplay.setForeground(Color.BLACK);
-                resultDisplay.setText("Undo");
-                revalidate();
-                repaint();
-            } catch (UndoException err) {
-                displayError(err);
-            }
-        });
         buttons.add(undoBtn);
         labelPanel.add(undoBtn);
         JButton redoBtn = new JButton("Redo");
-        redoBtn.addActionListener(e -> {
-            try {
-                Inference inference = logic.redo();
-                historyPanel.removeAll();;
-                historyLabels.add(new JLabel(inference.userDisplay()));
-                for (JLabel l : historyLabels) {
-                    historyPanel.add(l);
-                }
-                theoremDisplay.setText(logic.getProposition().toString());
-                resultDisplay.setForeground(Color.BLACK);
-                resultDisplay.setText("Redo");
-                revalidate();
-                repaint();
-            } catch (RedoException err) {
-                displayError(err);
-            }
-        });
         buttons.add(redoBtn);
         labelPanel.add(redoBtn);
         JPanel draftPanel = new JPanel();
@@ -255,10 +161,109 @@ public class ProofPanel extends JPanel {
 
         JPanel diagramPanel = new JPanel();
         diagramPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
-        currentDiagram = new JPanel();
+        currentDiagram = new DiagramPanel("Current Diagram", logic.getProposition());
         diagramPanel.add(currentDiagram);
-        currentDiagram.add(new PeirceDiagram(logic.getProposition()));
-        currentDiagram.setBackground(Color.WHITE);
+
+        undoBtn.addActionListener(e -> {
+            try {
+                logic.undo();
+                historyPanel.removeAll();
+                historyLabels.remove(historyLabels.size() - 1);
+                for (JLabel l : historyLabels) {
+                    historyPanel.add(l);
+                }
+                theoremDisplay.setText(logic.getProposition().toString());
+                resultDisplay.setForeground(Color.BLACK);
+                resultDisplay.setText("Undo");
+                currentDiagram.refresh(logic.getProposition());
+                revalidate();
+                repaint();
+            } catch (UndoException err) {
+                displayError(err);
+            }
+        });
+        redoBtn.addActionListener(e -> {
+            try {
+                Inference inference = logic.redo();
+                historyPanel.removeAll();;
+                historyLabels.add(new JLabel(inference.userDisplay()));
+                for (JLabel l : historyLabels) {
+                    historyPanel.add(l);
+                }
+                theoremDisplay.setText(logic.getProposition().toString());
+                resultDisplay.setForeground(Color.BLACK);
+                resultDisplay.setText("Redo");
+                currentDiagram.refresh(logic.getProposition());
+                revalidate();
+                repaint();
+            } catch (RedoException err) {
+                displayError(err);
+            }
+        });
+        addDoubleCutBtn.addActionListener(e -> {
+            try {
+                int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
+                int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
+                logic.addDoubleCut(start, end);
+                updateResult();
+                currentDiagram.refresh(logic.getProposition());
+                checkSuccess();
+            } catch (InvalidSelectionException err) {
+                displayError(err);
+            }
+        });
+        removeDoubleCutBtn.addActionListener(e -> {
+            try {
+                int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
+                int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
+                logic.removeDoubleCut(start, end);
+                updateResult();
+                currentDiagram.refresh(logic.getProposition());
+                checkSuccess();
+            } catch (InvalidSelectionException | InvalidInferenceException err) {
+                displayError(err);
+            }
+        });
+        theoremDisplay.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_X && e.isControlDown()) {
+                    try {
+                        int start = logic.getTokenIndex(theoremDisplay.getSelectionStart());
+                        int end = logic.getTokenIndex(theoremDisplay.getSelectionEnd());
+                        logic.cut(start, end);
+                        updateResult();
+                    } catch (InvalidSelectionException | InvalidInferenceException err) {
+                        displayError(err);
+                    }
+                } else if (e.getKeyCode() == KeyEvent.VK_V && e.isControlDown()) {
+                    try {
+                        int pos = logic.getTokenIndex(theoremDisplay.getSelectionStart());
+                        if (pos != logic.getTokenIndex(theoremDisplay.getSelectionEnd())) {
+                            throw new InvalidSelectionException("Please place your cursor in a deterministic " +
+                                    "position to insert new propositions.");
+                        }
+                        String toInsert = clipboard.getData(DataFlavor.stringFlavor).toString();
+                        logic.paste(pos, toInsert);
+                        updateResult();
+                    } catch (InvalidSelectionException | InvalidInferenceException | TheoremParseException |
+                            UnsupportedFlavorException | IOException err) {
+                        displayError(err);
+                    }
+                }
+                currentDiagram.refresh(logic.getProposition());
+                checkSuccess();
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+        });
+
 
         add(goalPanel);
         add(labelPanel);
@@ -288,8 +293,7 @@ public class ProofPanel extends JPanel {
         resultDisplay.setForeground(Color.BLACK);
         historyPanel.removeAll();
         historyLabels.clear();
-        currentDiagram.removeAll();
-        currentDiagram.add(new PeirceDiagram(logic.getProposition()));
+        currentDiagram.refresh(logic.getProposition());
         for (Inference i : logic.getHistory()) {
             JLabel l = new JLabel(i.userDisplay());
             historyLabels.add(l);
