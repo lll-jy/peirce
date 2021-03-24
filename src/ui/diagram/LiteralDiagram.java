@@ -34,4 +34,18 @@ public abstract class LiteralDiagram extends JPanel {
             isSelected = false;
         }
     }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+        if (selected) {
+            parent.unselectGrandchildren();
+            parent.unselectAncestors(true);
+        }
+    }
+
+    public void unselectAll() {
+        setSelected(false);
+    }
+
+    public abstract void unselectChild();
 }

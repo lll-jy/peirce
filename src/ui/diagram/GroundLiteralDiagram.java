@@ -21,13 +21,7 @@ public class GroundLiteralDiagram extends LiteralDiagram {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (isSelectMode) {
-                    if (!isSelected) {
-                        label.setForeground(Color.RED);
-                        isSelected = true;
-                    } else {
-                        label.setForeground(Color.BLACK);
-                        isSelected = false;
-                    }
+                    setSelected(!isSelected);
                 }
             }
 
@@ -47,5 +41,19 @@ public class GroundLiteralDiagram extends LiteralDiagram {
             public void mouseExited(MouseEvent e) {
             }
         });
+    }
+
+    @Override
+    public void setSelected(boolean selected) {
+        super.setSelected(selected);
+        if (selected) {
+            label.setForeground(Color.RED);
+        } else {
+            label.setForeground(Color.BLACK);
+        }
+    }
+
+    @Override
+    public void unselectChild() {
     }
 }

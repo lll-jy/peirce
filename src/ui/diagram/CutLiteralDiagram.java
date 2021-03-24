@@ -22,13 +22,7 @@ public class CutLiteralDiagram extends LiteralDiagram {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (isSelectMode) {
-                    if (!isSelected) {
-                        setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-                        isSelected = true;
-                    } else {
-                        setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-                        isSelected = false;
-                    }
+                    setSelected(!isSelected);
                 }
             }
 
@@ -54,5 +48,30 @@ public class CutLiteralDiagram extends LiteralDiagram {
     public void setSelectMode(boolean selectMode) {
         super.setSelectMode(selectMode);
         content.setSelectMode(selectMode);
+    }
+
+    @Override
+    public void setSelected(boolean selected) {
+        super.setSelected(selected);
+        if (selected) {
+            setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+        } else {
+            setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        }
+    }
+
+    @Override
+    public void unselectChild() {
+        content.unselectAll();
+    }
+
+    public void unselectAncestors() {
+        parent.unselectAncestors(false);
+    }
+
+    @Override
+    public void unselectAll() {
+        super.unselectAll();
+        content.unselectAll();
     }
 }

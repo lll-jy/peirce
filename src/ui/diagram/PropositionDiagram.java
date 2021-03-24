@@ -42,4 +42,28 @@ public class PropositionDiagram extends JPanel {
             ld.setSelectMode(selectMode);
         }
     }
+
+    public void unselectAll() {
+        for (LiteralDiagram ld : literalDiagrams) {
+            ld.unselectAll();
+        }
+    }
+
+    public void unselectGrandchildren() {
+        for (LiteralDiagram ld : literalDiagrams) {
+            ld.unselectChild();
+        }
+    }
+
+    public void unselectAncestors(boolean first) {
+        if (enclosingDiagram != null) {
+            enclosingDiagram.setSelected(false);
+            enclosingDiagram.unselectAncestors();
+        }
+        if (!first) {
+            for (LiteralDiagram ld : literalDiagrams) {
+                ld.setSelected(false);
+            }
+        }
+    }
 }
