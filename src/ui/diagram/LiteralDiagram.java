@@ -7,6 +7,9 @@ import model.Literal;
 import javax.swing.*;
 import java.util.List;
 
+/**
+ * Diagrams of a literal of Peirce's Alpha system.
+ */
 public abstract class LiteralDiagram extends JPanel {
     protected final Literal literal;
     protected PropositionDiagram parent;
@@ -15,6 +18,11 @@ public abstract class LiteralDiagram extends JPanel {
     protected boolean isDcMode;
     protected boolean isSelected;
 
+    /**
+     * Creates a literal diagram instance.
+     * @param literal the literal to draw.
+     * @param parent the proposition diagram holding this literal.
+     */
     protected LiteralDiagram(Literal literal, PropositionDiagram parent) {
         super();
         this.literal = literal;
@@ -25,6 +33,12 @@ public abstract class LiteralDiagram extends JPanel {
         isSelected = false;
     }
 
+    /**
+     * Creates a new literal diagram.
+     * @param literal the literal to create.
+     * @param parent the proposition diagram holding this literal.
+     * @return the created literal diagram.
+     */
     public static LiteralDiagram createLiteralDiagram(Literal literal, PropositionDiagram parent) {
         if (literal instanceof  GroundLiteral) {
             return new GroundLiteralDiagram((GroundLiteral) literal, parent);
@@ -33,6 +47,10 @@ public abstract class LiteralDiagram extends JPanel {
         }
     }
 
+    /**
+     * Sets the select mode of the diagram.
+     * @param selectMode the new select mode.
+     */
     public void setSelectMode(boolean selectMode) {
         isSelectMode = selectMode;
         if (!selectMode) {
@@ -40,10 +58,18 @@ public abstract class LiteralDiagram extends JPanel {
         }
     }
 
+    /**
+     * Sets the paste mode of the diagram.
+     * @param mode the new paste mode.
+     */
     public void setPasteMode(boolean mode) {
         isPasteMode = mode;
     }
 
+    /**
+     * Sets the selected status of the diagram and invalidate those incompatible with this new state.
+     * @param selected the new selected status.
+     */
     public void setSelected(boolean selected) {
         isSelected = selected;
         if (selected) {
@@ -52,16 +78,30 @@ public abstract class LiteralDiagram extends JPanel {
         }
     }
 
+    /**
+     * Unselect all descendants, including itself.
+     */
     public void unselectAll() {
         setSelected(false);
     }
 
+    /**
+     * Unselect the diagram directly enclosed in this one.
+     */
     public abstract void unselectChild();
 
+    /**
+     * Checks whether this diagram is selected.
+     * @return true if it is selected.
+     */
     public boolean isSelected() {
         return isSelected;
     }
 
+    /**
+     * Gets the selected literal diagrams in this diagram.
+     * @return the selected literal diagrams.
+     */
     public abstract List<LiteralDiagram> getSelectedLiterals();
 
     @Override
@@ -69,10 +109,18 @@ public abstract class LiteralDiagram extends JPanel {
         return literal.toString();
     }
 
+    /**
+     * Gets the literal of the diagram.
+     * @return the literal.
+     */
     public Literal getLiteral() {
         return literal;
     }
 
+    /**
+     * Sets the double cut mode of the diagram.
+     * @param mode the new double cut mode.
+     */
     public void setDcMode(boolean mode) {
         isDcMode = mode;
     }

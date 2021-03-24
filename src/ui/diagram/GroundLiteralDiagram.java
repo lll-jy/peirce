@@ -9,9 +9,17 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A diagram of a ground literal.
+ */
 public class GroundLiteralDiagram extends LiteralDiagram {
     private final JLabel label;
 
+    /**
+     * Creates a ground literal diagram.
+     * @param literal the ground literal to draw.
+     * @param parent the parent proposition diagram.
+     */
     public GroundLiteralDiagram(GroundLiteral literal, PropositionDiagram parent) {
         super(literal, parent);
         label = new JLabel(literal.toString());

@@ -8,9 +8,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
 
+/**
+ * A literal diagram of a cut literal.
+ */
 public class CutLiteralDiagram extends LiteralDiagram {
-    private PropositionDiagram content;
+    private final PropositionDiagram content;
 
+    /**
+     * Creates a cut literal diagram.
+     * @param literal the literal of this diagram.
+     * @param parent the parent diagram holding this literal diagram.
+     */
     public CutLiteralDiagram(CutLiteral literal, PropositionDiagram parent) {
         super(literal, parent);
         setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
@@ -66,6 +74,9 @@ public class CutLiteralDiagram extends LiteralDiagram {
         content.unselectAll();
     }
 
+    /**
+     * Unselect all ancestors of this cut literal diagram.
+     */
     public void unselectAncestors() {
         parent.unselectAncestors(false);
     }

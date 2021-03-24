@@ -577,6 +577,12 @@ public class Logic {
         filePath = path;
     }
 
+    /**
+     * Opens the file at the given path.
+     * @param path the file path.
+     * @throws FilePathException if the file path is invalid.
+     * @throws FileReadException if the file content format is invalid.
+     */
     public void open(String path) throws FilePathException, FileReadException {
         filePath = path;
         Storage.loadFile(path, this);

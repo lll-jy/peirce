@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
+/**
+ * A diagram of a proposition in Peirce's Alpha system.
+ */
 public class PropositionDiagram extends JPanel {
     private final Proposition proposition;
     private boolean isSelectMode;
@@ -20,6 +23,10 @@ public class PropositionDiagram extends JPanel {
     private final List<LiteralDiagram> literalDiagrams;
     private CutLiteralDiagram enclosingDiagram;
 
+    /**
+     * Creates a diagram corresponding to the given proposition.
+     * @param proposition the proposition to draw.
+     */
     public PropositionDiagram(Proposition proposition) {
         super();
         this.proposition = proposition;
@@ -73,7 +80,9 @@ public class PropositionDiagram extends JPanel {
             @Override
             public void mouseEntered(MouseEvent e) {
                 if (isPasteMode || isDcMode) {
-                    setBackground(new Color(156, 10, 10, 101));
+                    Color highlightColor = new Color(255, 217, 27, 208);
+                    setBackground(highlightColor);
+                    getParent().setBackground(highlightColor);
                 }
             }
 
@@ -82,19 +91,31 @@ public class PropositionDiagram extends JPanel {
                 if (isPasteMode || isDcMode) {
                     if (proposition.getLevel() % 2 == 0) {
                         setBackground(Color.WHITE);
+                        getParent().setBackground(Color.WHITE);
                     } else {
-                        setBackground(new Color(238, 238, 238));
+                        Color defaultBackgroundColor = new Color(238, 238, 238);
+                        setBackground(defaultBackgroundColor);
+                        getParent().setBackground(defaultBackgroundColor);
                     }
                 }
             }
         });
     }
 
+    /**
+     * Creates a diagram corresponding to the given proposition wrapped in an enclosing cut.
+     * @param proposition the proposition to draw.
+     * @param enclosingDiagram the enclosing cut diagram.
+     */
     public PropositionDiagram(Proposition proposition, CutLiteralDiagram enclosingDiagram) {
         this(proposition);
         this.enclosingDiagram = enclosingDiagram;
     }
 
+    /**
+     * Sets the select mode of the diagram.
+     * @param selectMode the new select mode.
+     */
     public void setSelectMode(boolean selectMode) {
         isSelectMode = selectMode;
         for (LiteralDiagram ld : literalDiagrams) {
@@ -102,6 +123,10 @@ public class PropositionDiagram extends JPanel {
         }
     }
 
+    /**
+     * Sets the paste mode of the diagram.
+     * @param mode the new paste mode.
+     */
     public void setPasteMode(boolean mode) {
         isPasteMode = mode;
         for (LiteralDiagram ld : literalDiagrams) {
@@ -114,18 +139,28 @@ public class PropositionDiagram extends JPanel {
         }
     }
 
+    /**
+     * Unselect all children and descendants.
+     */
     public void unselectAll() {
         for (LiteralDiagram ld : literalDiagrams) {
             ld.unselectAll();
         }
     }
 
+    /**
+     * Unselect all descendants except the direct children.
+     */
     public void unselectGrandchildren() {
         for (LiteralDiagram ld : literalDiagrams) {
             ld.unselectChild();
         }
     }
 
+    /**
+     * Unselect all ancestors of the diagram.
+     * @param first true if it is the first round if recursive call.
+     */
     public void unselectAncestors(boolean first) {
         if (enclosingDiagram != null) {
             enclosingDiagram.setSelected(false);
@@ -138,6 +173,10 @@ public class PropositionDiagram extends JPanel {
         }
     }
 
+    /**
+     * Gets the list of selected literal diagrams in this diagram.
+     * @return the list of selected literal diagrams.
+     */
     public List<LiteralDiagram> getSelectedLiterals() {
         List<LiteralDiagram> result = new ArrayList<>();
         for (LiteralDiagram ld : literalDiagrams) {
@@ -158,6 +197,10 @@ public class PropositionDiagram extends JPanel {
         }
     }
 
+    /**
+     * Sets the double cut mode of the diagram.
+     * @param mode the new double cut mode.
+     */
     public void setDcMode(boolean mode) {
         isDcMode = mode;
         for (LiteralDiagram ld : literalDiagrams) {
