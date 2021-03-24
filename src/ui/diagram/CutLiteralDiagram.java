@@ -86,4 +86,10 @@ public class CutLiteralDiagram extends LiteralDiagram {
         super.setPasteMode(mode);
         content.setPasteMode(mode);
     }
+
+    @Override
+    public void setDcMode(boolean mode) {
+        super.setDcMode(mode);
+        content.setDcMode(mode);
+    }
 }

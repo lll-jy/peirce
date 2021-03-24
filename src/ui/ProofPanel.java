@@ -39,6 +39,7 @@ import java.util.function.Consumer;
 public class ProofPanel extends JPanel {
     private static final int resultDisplayLength = 55;
     public static Consumer<Proposition> paste;
+    public static Consumer<Proposition> insertDoubleCut;
 
     private final Logic logic;
     private final JLabel goalDisplay;
@@ -111,7 +112,7 @@ public class ProofPanel extends JPanel {
         infoPanelSetup(historyPane, infoPanel);
 
         actionListenersSetup(addDoubleCutBtn, removeDoubleCutBtn, undoBtn, redoBtn, drawDraftBtn,
-                draftInput, copyBtn, cutBtn, pasteBtn);
+                draftInput, copyBtn, cutBtn, pasteBtn, dciBtn);
 
         add(labelPanel);
         add(workPanel);
@@ -126,7 +127,7 @@ public class ProofPanel extends JPanel {
     private void actionListenersSetup(
             JButton addDoubleCutBtn, JButton removeDoubleCutBtn,
             JButton undoBtn, JButton redoBtn, JButton drawDraftBtn, JTextArea draftInput,
-            JButton copyBtn, JButton cutBtn, JButton pasteBtn) {
+            JButton copyBtn, JButton cutBtn, JButton pasteBtn, JButton dciBtn) {
         undoBtn.addActionListener(e -> {
             try {
                 logic.undo();
@@ -286,20 +287,56 @@ public class ProofPanel extends JPanel {
                             literals.add(ld.getLiteral().copy());
                         }
                         toInsert.addLiterals(literals);
+                        for (Literal l : literals) {
+                            l.setParent(toInsert);
+                        }
                         try {
-                            logic.paste(toInsert, prop, 0);
+                            logic.paste(toInsert, prop, prop.getStartIndex());
                             updateResult();
-                            checkSuccess();
                         } catch (InvalidSelectionException | InvalidInferenceException err) {
                             displayError(err);
                         }
                     }
+                    pasteBtn.setText("Paste");
+                    checkSuccess();
                 };
                 currentDiagram.setPasteMode(true);
             } else {
                 pasteBtn.setText("Paste");
                 paste = (prop) -> {};
                 currentDiagram.setPasteMode(false);
+            }
+        });
+        dciBtn.addActionListener(e -> {
+            List<LiteralDiagram> selectedLiteralDiagrams = currentDiagram.getSelectedLiterals();
+            if (selectedLiteralDiagrams.isEmpty()) {
+                currentDiagram.setDcMode(true);
+                insertDoubleCut = (prop) -> {
+                    try {
+                        logic.addDoubleCut(new ArrayList<>(), prop, prop.getStartIndex());
+                        if (prop.isBaseProp()) {
+                            logic.setProposition(prop);
+                        }
+                        updateResult();
+                        currentDiagram.setDcMode(false);
+                        checkSuccess();
+                    } catch (InvalidSelectionException err) {
+                        displayError(err);
+                    }
+                };
+            } else {
+                List<Literal> literals = new ArrayList<>();
+                for (LiteralDiagram ld : selectedLiteralDiagrams) {
+                    literals.add(ld.getLiteral());
+                }
+                Proposition parent = literals.get(0).getParent();
+                try {
+                    logic.addDoubleCut(literals, parent, parent.getStartIndex());
+                    updateResult();
+                    checkSuccess();
+                } catch (InvalidSelectionException err) {
+                    displayError(err);
+                }
             }
         });
     }

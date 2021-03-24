@@ -1,5 +1,6 @@
 package ui.diagram;
 
+import static javax.swing.JOptionPane.YES_OPTION;
 import model.Literal;
 import model.Proposition;
 import ui.ProofPanel;
@@ -15,6 +16,7 @@ public class PropositionDiagram extends JPanel {
     private final Proposition proposition;
     private boolean isSelectMode;
     private boolean isPasteMode;
+    private boolean isDcMode;
     private final List<LiteralDiagram> literalDiagrams;
     private CutLiteralDiagram enclosingDiagram;
 
@@ -23,6 +25,7 @@ public class PropositionDiagram extends JPanel {
         this.proposition = proposition;
         isSelectMode = false;
         isPasteMode = false;
+        isDcMode = false;
         this.literalDiagrams = new ArrayList<>();
         enclosingDiagram = null;
         List<Literal> literals = proposition.getLiterals();
@@ -37,8 +40,25 @@ public class PropositionDiagram extends JPanel {
         addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (isPasteMode) {
+                if (isPasteMode && isDcMode) {
+                    Object[] options = {"Add empty double cut", "Paste"};
+                    int paste = JOptionPane.showOptionDialog(JOptionPane.getRootFrame(),
+                            "Which action do you want to perform?",
+                            "Action Inquiry",
+                            JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.WARNING_MESSAGE,
+                            null,
+                            options,
+                            options[1]);
+                    if (paste == YES_OPTION) {
+                        ProofPanel.paste.accept(proposition);
+                    } else {
+                        ProofPanel.insertDoubleCut.accept(proposition);
+                    }
+                } else if (isPasteMode) {
                     ProofPanel.paste.accept(proposition);
+                } else if (isDcMode) {
+                    ProofPanel.insertDoubleCut.accept(proposition);
                 }
             }
 
@@ -52,14 +72,14 @@ public class PropositionDiagram extends JPanel {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (isPasteMode) {
+                if (isPasteMode || isDcMode) {
                     setBackground(new Color(156, 10, 10, 101));
                 }
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                if (isPasteMode) {
+                if (isPasteMode || isDcMode) {
                     if (proposition.getLevel() % 2 == 0) {
                         setBackground(Color.WHITE);
                     } else {
@@ -135,6 +155,18 @@ public class PropositionDiagram extends JPanel {
             return new ArrayList<>();
         } else {
             return result;
+        }
+    }
+
+    public void setDcMode(boolean mode) {
+        isDcMode = mode;
+        for (LiteralDiagram ld : literalDiagrams) {
+            ld.setDcMode(mode);
+        }
+        if (proposition.getLevel() % 2 == 0) {
+            setBackground(Color.WHITE);
+        } else {
+            setBackground(new Color(238, 238, 238));
         }
     }
 

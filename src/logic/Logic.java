@@ -336,15 +336,34 @@ public class Logic {
     }
 
     /**
+     * Sets the proposition held by the model.
+     * @param prop the new proposition.
+     */
+    public void setProposition(Proposition prop) {
+        model.setProposition(prop);
+    }
+
+    /**
      * Adds a double cut surrounding the selected part.
      * @param s the start index of the selected part.
      * @param e the end index of the selected part (exclusive).
      * @throws InvalidSelectionException if the selected part is not a valid proposition.
      */
     public void addDoubleCut(int s, int e) throws InvalidSelectionException {
-        String from = getProposition().toString();
         List<Literal> literals = getSelected(s, e);
         Proposition parent = getCursorProp(s);
+        addDoubleCut(literals, parent, s);
+    }
+
+    /**
+     * Adds a double cut surrounding the selected part.
+     * @param literals the literals selected.
+     * @param parent the parent of the literals selected.
+     * @param s the index where the resulting literal should insert.
+     * @throws InvalidSelectionException if the selected part is not a valid proposition.
+     */
+    public void addDoubleCut(List<Literal> literals, Proposition parent, int s) throws InvalidSelectionException {
+        String from = getProposition().toString();
         CutLiteral res = new CutLiteral(parent, null);
         Proposition outer = new Proposition(parent.getLevel() + 1, res);
         res.setContent(outer);
@@ -519,10 +538,6 @@ public class Logic {
      */
     public Stack<Inference> getHistory() {
         return history;
-    }
-
-    public void dummy() {
-        System.out.println("called here");
     }
 
     /**
