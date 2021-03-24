@@ -59,4 +59,9 @@ public class GroundLiteral extends Literal {
     public String toString() {
         return variableName + " ";
     }
+
+    @Override
+    public Literal copy() {
+        return new GroundLiteral(null, variableName);
+    }
 }

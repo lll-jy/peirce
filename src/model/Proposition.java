@@ -322,6 +322,22 @@ public class Proposition {
         }
     }
 
+    /**
+     * Makes a copy of this proposition instance.
+     * @return the copied instance.
+     */
+    public Proposition copy() {
+        Proposition prop = new Proposition();
+        List<Literal> copiedLiterals = new ArrayList<>();
+        for (Literal l : literals) {
+            copiedLiterals.add(l.copy());
+        }
+        for (Literal l : copiedLiterals) {
+            l.setParent(prop);
+        }
+        return prop;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

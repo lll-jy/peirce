@@ -423,12 +423,25 @@ public class Logic {
      */
     public void paste(int pos, String str) throws TheoremParseException,
             InvalidSelectionException, InvalidInferenceException {
-        String from = getProposition().toString();
         Proposition prop = parseFrame(str);
         Proposition parent = getCursorProp(pos);
+        paste(prop, parent, pos);
+    }
+
+    /**
+     * Performs paste action to insert some diagrams to the theorem by some inference rule.
+     * @param toInsert the proposition to insert.
+     * @param parent the parent, i.e. destination proposition to insert.
+     * @param pos the index of the parent to insert.
+     * @throws InvalidSelectionException if the cursor position is invalid to insert anything.
+     * @throws InvalidInferenceException if the proposition cannot be inserted by any inference rule.
+     */
+    public void paste(Proposition toInsert, Proposition parent, int pos) throws
+            InvalidSelectionException, InvalidInferenceException {
+        String from = getProposition().toString();
         boolean insertionApplied = false;
         boolean iterationApplied = false;
-        for (Literal l : prop.getLiterals()) {
+        for (Literal l : toInsert.getLiterals()) {
             InferenceRule rule = parent.getInsertRule(l);
             switch (rule) {
                 case INSERTION -> insertionApplied = true;
@@ -436,8 +449,8 @@ public class Logic {
             }
             l.setParent(parent);
         }
-        prop.increaseLevelBy(parent.getLevel());
-        parent.insertLiterals(pos, prop.getLiterals());
+        toInsert.increaseLevelBy(parent.getLevel());
+        parent.insertLiterals(pos, toInsert.getLiterals());
         String to = getProposition().toString();
         if (insertionApplied) {
             if (iterationApplied) {

@@ -11,6 +11,7 @@ public abstract class LiteralDiagram extends JPanel {
     protected final Literal literal;
     protected PropositionDiagram parent;
     protected boolean isSelectMode;
+    protected boolean isPasteMode;
     protected boolean isSelected;
 
     protected LiteralDiagram(Literal literal, PropositionDiagram parent) {
@@ -18,6 +19,7 @@ public abstract class LiteralDiagram extends JPanel {
         this.literal = literal;
         this.parent = parent;
         isSelectMode = false;
+        isPasteMode = false;
         isSelected = false;
     }
 
@@ -34,6 +36,10 @@ public abstract class LiteralDiagram extends JPanel {
         if (!selectMode) {
             isSelected = false;
         }
+    }
+
+    public void setPasteMode(boolean mode) {
+        isPasteMode = mode;
     }
 
     public void setSelected(boolean selected) {

@@ -155,4 +155,10 @@ public abstract class Literal {
      * @param inc the number of levels to increase.
      */
     abstract public void increaseLevelBy(int inc);
+
+    /**
+     * Makes a copy of this literal instance.
+     * @return the copied instance.
+     */
+    abstract public Literal copy();
 }

@@ -14,12 +14,14 @@ public class DiagramPanel extends JPanel {
     private Proposition proposition;
     private final JPanel canvasPanel;
     private boolean isSelectMode;
+    private boolean isPasteMode;
     private PropositionDiagram diagram;
 
     public DiagramPanel(String title, Proposition proposition, int width, int height) {
         super();
         this.proposition = proposition;
         isSelectMode = false;
+        isPasteMode = false;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         JPanel labelPanel = new JPanel();
@@ -56,6 +58,11 @@ public class DiagramPanel extends JPanel {
 
     public boolean isSelectMode() {
         return isSelectMode;
+    }
+
+    public void setPasteMode(boolean mode) {
+        isPasteMode = mode;
+        diagram.setPasteMode(mode);
     }
 
     public List<LiteralDiagram> getSelectedLiterals() {

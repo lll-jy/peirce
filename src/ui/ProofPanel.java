@@ -31,12 +31,14 @@ import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * The panel that the user constructs the reasoning for proof.
  */
 public class ProofPanel extends JPanel {
     private static final int resultDisplayLength = 55;
+    public static Consumer<Proposition> paste;
 
     private final Logic logic;
     private final JLabel goalDisplay;
@@ -267,12 +269,39 @@ public class ProofPanel extends JPanel {
                 try {
                     logic.cut(literals, parent);
                     updateResult();
+                    checkSuccess();
                 } catch (InvalidInferenceException err) {
                     displayError(err);
                 }
             }
         });
-
+        pasteBtn.addActionListener(e -> {
+            if (pasteBtn.getText().equals("Paste")) {
+                pasteBtn.setText("Exit paste");
+                paste = (prop) -> {
+                    if (!copied.isEmpty()) {
+                        Proposition toInsert = new Proposition();
+                        List<Literal> literals = new ArrayList<>();
+                        for (LiteralDiagram ld : copied) {
+                            literals.add(ld.getLiteral().copy());
+                        }
+                        toInsert.addLiterals(literals);
+                        try {
+                            logic.paste(toInsert, prop, 0);
+                            updateResult();
+                            checkSuccess();
+                        } catch (InvalidSelectionException | InvalidInferenceException err) {
+                            displayError(err);
+                        }
+                    }
+                };
+                currentDiagram.setPasteMode(true);
+            } else {
+                pasteBtn.setText("Paste");
+                paste = (prop) -> {};
+                currentDiagram.setPasteMode(false);
+            }
+        });
     }
 
     private void infoPanelSetup(JScrollPane historyPane, JPanel infoPanel) {

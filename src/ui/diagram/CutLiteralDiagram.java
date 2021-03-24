@@ -80,4 +80,10 @@ public class CutLiteralDiagram extends LiteralDiagram {
     public List<LiteralDiagram> getSelectedLiterals() {
         return content.getSelectedLiterals();
     }
+
+    @Override
+    public void setPasteMode(boolean mode) {
+        super.setPasteMode(mode);
+        content.setPasteMode(mode);
+    }
 }

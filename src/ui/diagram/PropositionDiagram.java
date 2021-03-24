@@ -2,6 +2,7 @@ package ui.diagram;
 
 import model.Literal;
 import model.Proposition;
+import ui.ProofPanel;
 
 import java.awt.Color;
 import java.awt.event.MouseEvent;
@@ -13,6 +14,7 @@ import javax.swing.*;
 public class PropositionDiagram extends JPanel {
     private final Proposition proposition;
     private boolean isSelectMode;
+    private boolean isPasteMode;
     private final List<LiteralDiagram> literalDiagrams;
     private CutLiteralDiagram enclosingDiagram;
 
@@ -20,6 +22,7 @@ public class PropositionDiagram extends JPanel {
         super();
         this.proposition = proposition;
         isSelectMode = false;
+        isPasteMode = false;
         this.literalDiagrams = new ArrayList<>();
         enclosingDiagram = null;
         List<Literal> literals = proposition.getLiterals();
@@ -34,6 +37,9 @@ public class PropositionDiagram extends JPanel {
         addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                if (isPasteMode) {
+                    ProofPanel.paste.accept(proposition);
+                }
             }
 
             @Override
@@ -46,14 +52,14 @@ public class PropositionDiagram extends JPanel {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (isSelectMode) {
+                if (isPasteMode) {
                     setBackground(new Color(156, 10, 10, 101));
                 }
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                if (isSelectMode) {
+                if (isPasteMode) {
                     if (proposition.getLevel() % 2 == 0) {
                         setBackground(Color.WHITE);
                     } else {
@@ -73,6 +79,18 @@ public class PropositionDiagram extends JPanel {
         isSelectMode = selectMode;
         for (LiteralDiagram ld : literalDiagrams) {
             ld.setSelectMode(selectMode);
+        }
+    }
+
+    public void setPasteMode(boolean mode) {
+        isPasteMode = mode;
+        for (LiteralDiagram ld : literalDiagrams) {
+            ld.setPasteMode(mode);
+        }
+        if (proposition.getLevel() % 2 == 0) {
+            setBackground(Color.WHITE);
+        } else {
+            setBackground(new Color(238, 238, 238));
         }
     }
 
