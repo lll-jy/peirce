@@ -8,6 +8,7 @@ import logic.exceptions.RedoException;
 import logic.exceptions.TheoremParseException;
 import logic.exceptions.UndoException;
 import model.Inference;
+import model.Literal;
 import model.Proposition;
 import static ui.Ui.DC_IMG;
 import static ui.Ui.RDC_IMG;
@@ -108,7 +109,7 @@ public class ProofPanel extends JPanel {
         infoPanelSetup(historyPane, infoPanel);
 
         actionListenersSetup(addDoubleCutBtn, removeDoubleCutBtn, undoBtn, redoBtn, drawDraftBtn,
-                draftInput, copyBtn);
+                draftInput, copyBtn, cutBtn, pasteBtn);
 
         add(labelPanel);
         add(workPanel);
@@ -123,7 +124,7 @@ public class ProofPanel extends JPanel {
     private void actionListenersSetup(
             JButton addDoubleCutBtn, JButton removeDoubleCutBtn,
             JButton undoBtn, JButton redoBtn, JButton drawDraftBtn, JTextArea draftInput,
-            JButton copyBtn) {
+            JButton copyBtn, JButton cutBtn, JButton pasteBtn) {
         undoBtn.addActionListener(e -> {
             try {
                 logic.undo();
@@ -254,8 +255,24 @@ public class ProofPanel extends JPanel {
             } else {
                 copied = propSelected;
             }
-            System.out.println(copied);
         });
+        cutBtn.addActionListener(e -> {
+            List<LiteralDiagram> selectedLiteralDiagrams = currentDiagram.getSelectedLiterals();
+            if (!selectedLiteralDiagrams.isEmpty()) {
+                List<Literal> literals = new ArrayList<>();
+                for (LiteralDiagram ld : selectedLiteralDiagrams) {
+                    literals.add(ld.getLiteral());
+                }
+                Proposition parent = literals.get(0).getParent();
+                try {
+                    logic.cut(literals, parent);
+                    updateResult();
+                } catch (InvalidInferenceException err) {
+                    displayError(err);
+                }
+            }
+        });
+
     }
 
     private void infoPanelSetup(JScrollPane historyPane, JPanel infoPanel) {

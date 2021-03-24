@@ -376,9 +376,19 @@ public class Logic {
      * @throws InvalidInferenceException if the part selected is not valid to remove by any inference rule.
      */
     public void cut(int s, int e) throws InvalidSelectionException, InvalidInferenceException {
-        String from = getProposition().toString();
         List<Literal> literals = getSelected(s, e);
         Proposition parent = getCursorProp(s);
+        cut(literals, parent);
+    }
+
+    /**
+     * Performs cut action to remove some part in the theorem by some inference rule.
+     * @param literals the literals to remove.
+     * @param parent the parent of the literals to remove.
+     * @throws InvalidInferenceException if the part selected is not deletable.
+     */
+    public void cut(List<Literal> literals, Proposition parent) throws InvalidInferenceException {
+        String from = getProposition().toString();
         boolean erasureApplied = false;
         boolean deiterationApplied = false;
         for (Literal l : literals) {

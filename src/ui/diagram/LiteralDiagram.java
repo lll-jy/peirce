@@ -60,4 +60,8 @@ public abstract class LiteralDiagram extends JPanel {
     public String toString() {
         return literal.toString();
     }
+
+    public Literal getLiteral() {
+        return literal;
+    }
 }
