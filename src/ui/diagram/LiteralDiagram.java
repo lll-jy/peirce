@@ -5,6 +5,7 @@ import model.GroundLiteral;
 import model.Literal;
 
 import javax.swing.*;
+import java.util.List;
 
 public abstract class LiteralDiagram extends JPanel {
     protected final Literal literal;
@@ -48,4 +49,15 @@ public abstract class LiteralDiagram extends JPanel {
     }
 
     public abstract void unselectChild();
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public abstract List<LiteralDiagram> getSelectedLiterals();
+
+    @Override
+    public String toString() {
+        return literal.toString();
+    }
 }

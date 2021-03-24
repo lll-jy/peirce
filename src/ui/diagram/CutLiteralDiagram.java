@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.List;
 
 public class CutLiteralDiagram extends LiteralDiagram {
     private PropositionDiagram content;
@@ -73,5 +74,10 @@ public class CutLiteralDiagram extends LiteralDiagram {
     public void unselectAll() {
         super.unselectAll();
         content.unselectAll();
+    }
+
+    @Override
+    public List<LiteralDiagram> getSelectedLiterals() {
+        return content.getSelectedLiterals();
     }
 }

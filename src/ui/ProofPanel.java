@@ -1,5 +1,6 @@
 package ui;
 
+import static javax.swing.JOptionPane.YES_OPTION;
 import logic.Logic;
 import logic.exceptions.InvalidInferenceException;
 import logic.exceptions.InvalidSelectionException;
@@ -10,6 +11,7 @@ import model.Inference;
 import model.Proposition;
 import static ui.Ui.DC_IMG;
 import static ui.Ui.RDC_IMG;
+import ui.diagram.LiteralDiagram;
 
 import javax.swing.*;
 import java.awt.datatransfer.Clipboard;
@@ -25,8 +27,6 @@ import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +48,7 @@ public class ProofPanel extends JPanel {
     private final Clipboard clipboard;
     private final List<JLabel> historyLabels;
     private final List<JButton> buttons;
+    private List<LiteralDiagram> copied;
 
     /**
      * Constructs the proof panel.
@@ -58,6 +59,7 @@ public class ProofPanel extends JPanel {
         this.logic = logic;
         this.clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         this.buttons = new ArrayList<>();
+        this.copied = new ArrayList<>();
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -105,8 +107,8 @@ public class ProofPanel extends JPanel {
         resultDisplay = new JLabel();
         infoPanelSetup(historyPane, infoPanel);
 
-        actionListenersSetup(logic, addDoubleCutBtn, removeDoubleCutBtn, undoBtn, redoBtn, drawDraftBtn,
-                draftInput);
+        actionListenersSetup(addDoubleCutBtn, removeDoubleCutBtn, undoBtn, redoBtn, drawDraftBtn,
+                draftInput, copyBtn);
 
         add(labelPanel);
         add(workPanel);
@@ -118,8 +120,10 @@ public class ProofPanel extends JPanel {
         }
     }
 
-    private void actionListenersSetup(Logic logic, JButton addDoubleCutBtn, JButton removeDoubleCutBtn,
-                                      JButton undoBtn, JButton redoBtn, JButton drawDraftBtn, JTextArea draftInput) {
+    private void actionListenersSetup(
+            JButton addDoubleCutBtn, JButton removeDoubleCutBtn,
+            JButton undoBtn, JButton redoBtn, JButton drawDraftBtn, JTextArea draftInput,
+            JButton copyBtn) {
         undoBtn.addActionListener(e -> {
             try {
                 logic.undo();
@@ -226,6 +230,31 @@ public class ProofPanel extends JPanel {
             } catch (TheoremParseException tpe) {
                 displayError(tpe);
             }
+        });
+        copyBtn.addActionListener(e -> {
+            List<LiteralDiagram> propSelected = currentDiagram.getSelectedLiterals();
+            List<LiteralDiagram> draftSelected = draftDiagram.getSelectedLiterals();
+            if (!propSelected.isEmpty() && !draftSelected.isEmpty()) {
+                Object[] options = {"From draft", "From proposition"};
+                int fromProp = JOptionPane.showOptionDialog(JOptionPane.getRootFrame(),
+                        "Cannot copy from two different diagrams. \n Where do you want to copy from?",
+                        "Copy Inquiry",
+                        JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.WARNING_MESSAGE,
+                        null,
+                        options,
+                        options[1]);
+                if (fromProp == YES_OPTION) {
+                    copied = propSelected;
+                } else {
+                    copied = draftSelected;
+                }
+            } else if (propSelected.isEmpty()) {
+                copied = draftSelected;
+            } else {
+                copied = propSelected;
+            }
+            System.out.println(copied);
         });
     }
 

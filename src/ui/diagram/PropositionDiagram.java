@@ -99,4 +99,29 @@ public class PropositionDiagram extends JPanel {
             }
         }
     }
+
+    public List<LiteralDiagram> getSelectedLiterals() {
+        List<LiteralDiagram> result = new ArrayList<>();
+        for (LiteralDiagram ld : literalDiagrams) {
+            if (ld.isSelected()) {
+                result.add(ld);
+            }
+        }
+        if (result.isEmpty()) {
+            for (LiteralDiagram ld : literalDiagrams) {
+                result = ld.getSelectedLiterals();
+                if (!result.isEmpty()) {
+                    return result;
+                }
+            }
+            return new ArrayList<>();
+        } else {
+            return result;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return proposition.toString();
+    }
 }

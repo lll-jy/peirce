@@ -1,10 +1,14 @@
 package ui;
 
 import model.Proposition;
+import ui.diagram.LiteralDiagram;
 import ui.diagram.PropositionDiagram;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.FlowLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.util.List;
 
 public class DiagramPanel extends JPanel {
     private Proposition proposition;
@@ -52,5 +56,9 @@ public class DiagramPanel extends JPanel {
 
     public boolean isSelectMode() {
         return isSelectMode;
+    }
+
+    public List<LiteralDiagram> getSelectedLiterals() {
+        return diagram.getSelectedLiterals();
     }
 }
