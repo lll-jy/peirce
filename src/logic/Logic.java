@@ -311,6 +311,16 @@ public class Logic {
     public void removeDoubleCut(int s, int e) throws InvalidSelectionException, InvalidInferenceException {
         List<Literal> literals = getSelected(s, e);
         Proposition parent = getCursorProp(s);
+        removeDoubleCut(literals, parent);
+    }
+
+    /**
+     * Removes double cut in the selected part if it is in the form "[ [ proposition ] ]".
+     * @param literals the literal of the double cut.
+     * @param parent the enclosing proposition of the double cut literal.
+     * @throws InvalidInferenceException if the selected part is not in the form "[ [ proposition ] ]".
+     */
+    public void removeDoubleCut(List<Literal> literals, Proposition parent) throws InvalidInferenceException {
         String from = getProposition().toString();
         if (literals.size() != 1) {
             throw new InvalidInferenceException("Please select a single literal to remove double cuts.");

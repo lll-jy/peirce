@@ -42,7 +42,7 @@ public class PropositionDiagram extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (isPasteMode && isDcMode) {
                     Object[] options = {"Add empty double cut", "Paste"};
-                    int paste = JOptionPane.showOptionDialog(JOptionPane.getRootFrame(),
+                    int dc = JOptionPane.showOptionDialog(JOptionPane.getRootFrame(),
                             "Which action do you want to perform?",
                             "Action Inquiry",
                             JOptionPane.YES_NO_CANCEL_OPTION,
@@ -50,10 +50,10 @@ public class PropositionDiagram extends JPanel {
                             null,
                             options,
                             options[1]);
-                    if (paste == YES_OPTION) {
-                        ProofPanel.paste.accept(proposition);
-                    } else {
+                    if (dc == YES_OPTION) {
                         ProofPanel.insertDoubleCut.accept(proposition);
+                    } else {
+                        ProofPanel.paste.accept(proposition);
                     }
                 } else if (isPasteMode) {
                     ProofPanel.paste.accept(proposition);

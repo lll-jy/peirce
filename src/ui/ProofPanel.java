@@ -112,7 +112,7 @@ public class ProofPanel extends JPanel {
         infoPanelSetup(historyPane, infoPanel);
 
         actionListenersSetup(addDoubleCutBtn, removeDoubleCutBtn, undoBtn, redoBtn, drawDraftBtn,
-                draftInput, copyBtn, cutBtn, pasteBtn, dciBtn);
+                draftInput, copyBtn, cutBtn, pasteBtn, dciBtn, dceBtn);
 
         add(labelPanel);
         add(workPanel);
@@ -127,7 +127,7 @@ public class ProofPanel extends JPanel {
     private void actionListenersSetup(
             JButton addDoubleCutBtn, JButton removeDoubleCutBtn,
             JButton undoBtn, JButton redoBtn, JButton drawDraftBtn, JTextArea draftInput,
-            JButton copyBtn, JButton cutBtn, JButton pasteBtn, JButton dciBtn) {
+            JButton copyBtn, JButton cutBtn, JButton pasteBtn, JButton dciBtn, JButton dceBtn) {
         undoBtn.addActionListener(e -> {
             try {
                 logic.undo();
@@ -240,7 +240,7 @@ public class ProofPanel extends JPanel {
             List<LiteralDiagram> draftSelected = draftDiagram.getSelectedLiterals();
             if (!propSelected.isEmpty() && !draftSelected.isEmpty()) {
                 Object[] options = {"From draft", "From proposition"};
-                int fromProp = JOptionPane.showOptionDialog(JOptionPane.getRootFrame(),
+                int fromDraft = JOptionPane.showOptionDialog(JOptionPane.getRootFrame(),
                         "Cannot copy from two different diagrams. \n Where do you want to copy from?",
                         "Copy Inquiry",
                         JOptionPane.YES_NO_CANCEL_OPTION,
@@ -248,10 +248,10 @@ public class ProofPanel extends JPanel {
                         null,
                         options,
                         options[1]);
-                if (fromProp == YES_OPTION) {
-                    copied = propSelected;
-                } else {
+                if (fromDraft == YES_OPTION) {
                     copied = draftSelected;
+                } else {
+                    copied = propSelected;
                 }
             } else if (propSelected.isEmpty()) {
                 copied = draftSelected;
@@ -293,6 +293,7 @@ public class ProofPanel extends JPanel {
                         try {
                             logic.paste(toInsert, prop, prop.getStartIndex());
                             updateResult();
+                            checkSuccess();
                         } catch (InvalidSelectionException | InvalidInferenceException err) {
                             displayError(err);
                         }
@@ -313,9 +314,10 @@ public class ProofPanel extends JPanel {
                 currentDiagram.setDcMode(true);
                 insertDoubleCut = (prop) -> {
                     try {
-                        logic.addDoubleCut(new ArrayList<>(), prop, prop.getStartIndex());
                         if (prop.isBaseProp()) {
-                            logic.setProposition(prop);
+                            logic.addDoubleCut(new ArrayList<>(), logic.getProposition(), 0);
+                        } else {
+                            logic.addDoubleCut(new ArrayList<>(), prop, prop.getStartIndex());
                         }
                         updateResult();
                         currentDiagram.setDcMode(false);
@@ -335,6 +337,23 @@ public class ProofPanel extends JPanel {
                     updateResult();
                     checkSuccess();
                 } catch (InvalidSelectionException err) {
+                    displayError(err);
+                }
+            }
+        });
+        dceBtn.addActionListener(e -> {
+            List<LiteralDiagram> selectedLiterals = currentDiagram.getSelectedLiterals();
+            if (!selectedLiterals.isEmpty()) {
+                List<Literal> literals = new ArrayList<>();
+                for (LiteralDiagram ld : selectedLiterals) {
+                    literals.add(ld.getLiteral());
+                }
+                Proposition parent = literals.get(0).getParent();
+                try {
+                    logic.removeDoubleCut(literals, parent);
+                    updateResult();
+                    checkSuccess();
+                } catch (InvalidInferenceException err) {
                     displayError(err);
                 }
             }

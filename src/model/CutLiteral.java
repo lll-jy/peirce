@@ -88,7 +88,9 @@ public class CutLiteral extends Literal {
     public Literal copy() {
         Proposition copiedProp = content.copy();
         copiedProp.increaseLevelBy(1);
-        return new CutLiteral(null, copiedProp);
+        CutLiteral copiedThis = new CutLiteral(null, copiedProp);
+        copiedProp.setEnclosingLiteral(copiedThis);
+        return copiedThis;
     }
 
     @Override
