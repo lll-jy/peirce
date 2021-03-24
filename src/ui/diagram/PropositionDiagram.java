@@ -4,6 +4,8 @@ import model.Literal;
 import model.Proposition;
 
 import java.awt.Color;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
@@ -29,6 +31,37 @@ public class PropositionDiagram extends JPanel {
         if (proposition.getLevel() % 2 == 0) {
             setBackground(Color.WHITE);
         }
+        addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (isSelectMode) {
+                    setBackground(new Color(156, 10, 10, 101));
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                if (isSelectMode) {
+                    if (proposition.getLevel() % 2 == 0) {
+                        setBackground(Color.WHITE);
+                    } else {
+                        setBackground(new Color(238, 238, 238));
+                    }
+                }
+            }
+        });
     }
 
     public PropositionDiagram(Proposition proposition, CutLiteralDiagram enclosingDiagram) {

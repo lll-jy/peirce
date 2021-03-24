@@ -25,6 +25,8 @@ import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,7 @@ public class ProofPanel extends JPanel {
     private final JLabel resultDisplay;
     private final JPanel historyPanel;
     private final DiagramPanel currentDiagram;
+    private final DiagramPanel draftDiagram;
     private final DiagramPanel goalDiagram;
     private final Clipboard clipboard;
     private final List<JLabel> historyLabels;
@@ -58,90 +61,25 @@ public class ProofPanel extends JPanel {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        JPanel goalPanel = new JPanel();
-        goalDisplay = new JLabel(String.format("Goal: %s", logic.getTheorem()));
-        goalPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
-        goalPanel.add(goalDisplay);
-
         JPanel labelPanel = new JPanel();
         labelPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
         labelPanel.add(new JLabel("Current Proposition:"));
 
         JPanel workPanel = new JPanel();
-        workPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
-        theoremDisplay = new JTextArea();
-        theoremDisplay.setLineWrap(true);
-        theoremDisplay.setAutoscrolls(true);
-        theoremDisplay.setMargin(new Insets(5, 5, 5, 5));
-        theoremDisplay.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                super.focusGained(e);
-                theoremDisplay.setEditable(false);
-                theoremDisplay.getCaret().setVisible(true);
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                super.focusLost(e);
-            }
-        });
-        theoremDisplay.setPreferredSize(new Dimension(500, 25));
-        workPanel.add(theoremDisplay);
-        JPanel btnPanel = new JPanel();
-        btnPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
         Icon dciTxtIcon = new ImageIcon(new ImageIcon(DC_IMG).getImage()
-                        .getScaledInstance(25,25, Image.SCALE_SMOOTH));
+                .getScaledInstance(25,25, Image.SCALE_SMOOTH));
         JButton addDoubleCutBtn = new JButton(dciTxtIcon);
-        buttons.add(addDoubleCutBtn);
-        btnPanel.add(addDoubleCutBtn);
         Icon dceTxtIcon = new ImageIcon(new ImageIcon(RDC_IMG).getImage()
                 .getScaledInstance(25,25,Image.SCALE_SMOOTH));
         JButton removeDoubleCutBtn = new JButton(dceTxtIcon);
-        buttons.add(removeDoubleCutBtn);
-        btnPanel.add(removeDoubleCutBtn);
-        workPanel.add(btnPanel);
+        theoremDisplay = textProofSetup(workPanel, addDoubleCutBtn, removeDoubleCutBtn);
 
-        JPanel resultPanel = new JPanel();
-        resultPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
-        resultDisplay = new JLabel();
-        resultPanel.add(resultDisplay);
-        addDoubleCutBtn.setToolTipText("Double Cut Introduction");
-        removeDoubleCutBtn.setToolTipText("Double Cut Elimination");
-
-        JPanel helperToolPanel = new JPanel();
-        helperToolPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
-        historyPanel = new JPanel();
-        historyPanel.setLayout(new BoxLayout(historyPanel, BoxLayout.Y_AXIS));
-        JScrollPane historyPane = new JScrollPane(historyPanel);
-        historyPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        historyPane.setPreferredSize(new Dimension(400, 255));
-        helperToolPanel.add(historyPane);
-        historyLabels = new ArrayList<>();
         JButton undoBtn = new JButton("Undo");
-        buttons.add(undoBtn);
-        labelPanel.add(undoBtn);
         JButton redoBtn = new JButton("Redo");
-        buttons.add(redoBtn);
-        labelPanel.add(redoBtn);
-        JPanel draftTxtPanel = new JPanel();
-        draftTxtPanel.setLayout(new BoxLayout(draftTxtPanel, BoxLayout.Y_AXIS));
-        JPanel draftLabelPanel = new JPanel();
-        draftLabelPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
-        draftLabelPanel.add(new JLabel("<html>You may do some <br/>rough work here:</html>"));
-        draftTxtPanel.add(draftLabelPanel);
-        JTextArea roughWorkArea = new JTextArea();
-        roughWorkArea.setLineWrap(true);
-        roughWorkArea.setAutoscrolls(true);
-        roughWorkArea.setMargin(new Insets(5, 5, 5, 5));
-        roughWorkArea.setPreferredSize(new Dimension(160, 200));
-        draftTxtPanel.add(roughWorkArea);
-        helperToolPanel.add(draftTxtPanel);
+        historyPanel = new JPanel();
+        historyLabels = new ArrayList<>();
+        JScrollPane historyPane = historyPanelSetup(labelPanel, undoBtn, redoBtn);
 
-        JPanel drawHeader = new JPanel();
-        drawHeader.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
-        drawHeader.add(new JLabel("Graph: "));
-        JButton selectBtn = new JButton("Select");
         JButton copyBtn = new JButton("Copy");
         JButton cutBtn = new JButton("Cut");
         JButton pasteBtn = new JButton("Paste");
@@ -151,61 +89,37 @@ public class ProofPanel extends JPanel {
                 .getScaledInstance(18,18, Image.SCALE_SMOOTH));
         JButton dciBtn = new JButton(dciDiagramIcon);
         JButton dceBtn = new JButton(dceDiagramIcon);
-        buttons.add(selectBtn);
-        buttons.add(copyBtn);
-        buttons.add(cutBtn);
-        buttons.add(pasteBtn);
-        buttons.add(dciBtn);
-        buttons.add(dceBtn);
-        drawHeader.add(selectBtn);
-        drawHeader.add(copyBtn);
-        drawHeader.add(cutBtn);
-        drawHeader.add(pasteBtn);
-        drawHeader.add(dciBtn);
-        drawHeader.add(dceBtn);
-        dciBtn.setToolTipText("Wrap with double cut");
-        dceBtn.setToolTipText("Remove outer double cut");
+        JPanel drawHeader = drawHeaderSetup(copyBtn, cutBtn, pasteBtn, dciBtn, dceBtn);
 
+        JButton drawDraftBtn = new JButton("Draw");
         JPanel diagramPanel = new JPanel();
-        diagramPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+        JTextArea draftInput = new JTextArea();
+        draftDiagram = new DiagramPanel("Draft Diagram: ", new Proposition(), 180, 140);
         currentDiagram = new DiagramPanel("Current Diagram: ",
                 logic.getProposition(), 400, 220);
-        diagramPanel.add(currentDiagram);
-        JPanel draftPanel = new JPanel();
-        draftPanel.setLayout(new BoxLayout(draftPanel, BoxLayout.Y_AXIS));
-        JPanel draftHeaderPanel = new JPanel();
-        draftHeaderPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
-        draftHeaderPanel.add(new JLabel("Draft:"));
-        JButton drawDraftBtn = new JButton("Draw");
-        drawDraftBtn.setToolTipText("Convert the canonical diagram string to diagram");
-        draftHeaderPanel.add(drawDraftBtn);
-        draftPanel.add(draftHeaderPanel);
-        JTextArea draftInput = new JTextArea();
-        draftInput.setLineWrap(true);
-        draftInput.setAutoscrolls(true);
-        draftInput.setMargin(new Insets(5, 5, 5, 5));
-        draftInput.setPreferredSize(new Dimension(180, 45));
-        draftPanel.add(draftInput);
-        DiagramPanel draftDiagram = new DiagramPanel("Draft Diagram: ", new Proposition(), 180, 140);
-        draftPanel.add(draftDiagram);
-        diagramPanel.add(draftPanel);
+        diagramPanelSetup(logic, drawDraftBtn, diagramPanel, draftInput, currentDiagram, draftDiagram);
 
         JPanel infoPanel = new JPanel();
-        infoPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
-        JPanel textInfoPanel = new JPanel();
-        textInfoPanel.setLayout(new BoxLayout(textInfoPanel, BoxLayout.Y_AXIS));
-        textInfoPanel.setPreferredSize(new Dimension(300, 170));
-        textInfoPanel.add(goalPanel);
-        textInfoPanel.add(historyPane);
-        JPanel graphInfoPanel = new JPanel();
-        graphInfoPanel.setLayout(new BoxLayout(graphInfoPanel, BoxLayout.Y_AXIS));
-        graphInfoPanel.setPreferredSize(new Dimension(280, 170));
+        goalDisplay = new JLabel(String.format("Goal: %s", logic.getTheorem()));
         goalDiagram = new DiagramPanel("Goal diagram: ", logic.getTheorem(), 280, 100);
-        graphInfoPanel.add(goalDiagram);
-        graphInfoPanel.add(resultPanel);
-        infoPanel.add(textInfoPanel);
-        infoPanel.add(graphInfoPanel);
+        resultDisplay = new JLabel();
+        infoPanelSetup(historyPane, infoPanel);
 
+        actionListenersSetup(logic, addDoubleCutBtn, removeDoubleCutBtn, undoBtn, redoBtn, drawDraftBtn,
+                draftInput);
+
+        add(labelPanel);
+        add(workPanel);
+        add(drawHeader);
+        add(diagramPanel);
+        add(infoPanel);
+        for (JButton b : buttons) {
+            b.setEnabled(false);
+        }
+    }
+
+    private void actionListenersSetup(Logic logic, JButton addDoubleCutBtn, JButton removeDoubleCutBtn,
+                                      JButton undoBtn, JButton redoBtn, JButton drawDraftBtn, JTextArea draftInput) {
         undoBtn.addActionListener(e -> {
             try {
                 logic.undo();
@@ -307,23 +221,121 @@ public class ProofPanel extends JPanel {
             try {
                 Proposition draftProp = logic.parseFrame(diagramCanonical);
                 draftDiagram.refresh(draftProp);
+                draftDiagram.setSelectMode(true);
                 resultDisplay.setText("");
             } catch (TheoremParseException tpe) {
                 displayError(tpe);
             }
         });
-        selectBtn.addActionListener(e -> {
-            currentDiagram.setSelectMode(!currentDiagram.isSelectMode());
-        });
+    }
 
-        add(labelPanel);
-        add(workPanel);
-        add(drawHeader);
-        add(diagramPanel);
-        add(infoPanel);
-        for (JButton b : buttons) {
-            b.setEnabled(false);
-        }
+    private void infoPanelSetup(JScrollPane historyPane, JPanel infoPanel) {
+        infoPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
+        JPanel textInfoPanel = new JPanel();
+        textInfoPanel.setLayout(new BoxLayout(textInfoPanel, BoxLayout.Y_AXIS));
+        textInfoPanel.setPreferredSize(new Dimension(300, 170));
+        JPanel goalPanel = new JPanel();
+        goalPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
+        goalPanel.add(goalDisplay);
+        textInfoPanel.add(goalPanel);
+        textInfoPanel.add(historyPane);
+        JPanel graphInfoPanel = new JPanel();
+        graphInfoPanel.setLayout(new BoxLayout(graphInfoPanel, BoxLayout.Y_AXIS));
+        graphInfoPanel.setPreferredSize(new Dimension(280, 170));
+        graphInfoPanel.add(goalDiagram);
+        JPanel resultPanel = new JPanel();
+        resultPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+        resultPanel.add(resultDisplay);
+        graphInfoPanel.add(resultPanel);
+        infoPanel.add(textInfoPanel);
+        infoPanel.add(graphInfoPanel);
+    }
+
+    private void diagramPanelSetup(Logic logic, JButton drawDraftBtn, JPanel diagramPanel, JTextArea draftInput,
+                                   DiagramPanel currentDiagram, DiagramPanel draftDiagram) {
+        diagramPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+        diagramPanel.add(currentDiagram);
+        JPanel draftPanel = new JPanel();
+        draftPanel.setLayout(new BoxLayout(draftPanel, BoxLayout.Y_AXIS));
+        JPanel draftHeaderPanel = new JPanel();
+        draftHeaderPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
+        draftHeaderPanel.add(new JLabel("Draft:"));
+        buttons.add(drawDraftBtn);
+        drawDraftBtn.setToolTipText("Convert the canonical diagram string to diagram");
+        draftHeaderPanel.add(drawDraftBtn);
+        draftPanel.add(draftHeaderPanel);
+        draftInput.setLineWrap(true);
+        draftInput.setAutoscrolls(true);
+        draftInput.setMargin(new Insets(5, 5, 5, 5));
+        draftInput.setPreferredSize(new Dimension(180, 45));
+        draftPanel.add(draftInput);
+        draftPanel.add(draftDiagram);
+        diagramPanel.add(draftPanel);
+    }
+
+    private JPanel drawHeaderSetup(JButton copyBtn, JButton cutBtn, JButton pasteBtn, JButton dciBtn, JButton dceBtn) {
+        buttons.add(copyBtn);
+        buttons.add(cutBtn);
+        buttons.add(pasteBtn);
+        buttons.add(dciBtn);
+        buttons.add(dceBtn);
+        JPanel drawHeader = new JPanel();
+        drawHeader.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+        drawHeader.add(new JLabel("Graph: "));
+        drawHeader.add(copyBtn);
+        drawHeader.add(cutBtn);
+        drawHeader.add(pasteBtn);
+        drawHeader.add(dciBtn);
+        drawHeader.add(dceBtn);
+        dciBtn.setToolTipText("Wrap with double cut");
+        dceBtn.setToolTipText("Remove outer double cut");
+        return drawHeader;
+    }
+
+    private JScrollPane historyPanelSetup(JPanel labelPanel, JButton undoBtn, JButton redoBtn) {
+        historyPanel.setLayout(new BoxLayout(historyPanel, BoxLayout.Y_AXIS));
+        JScrollPane historyPane = new JScrollPane(historyPanel);
+        historyPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        historyPane.setPreferredSize(new Dimension(400, 255));
+        buttons.add(undoBtn);
+        labelPanel.add(undoBtn);
+        buttons.add(redoBtn);
+        labelPanel.add(redoBtn);
+        return historyPane;
+    }
+
+    private JTextArea textProofSetup(JPanel workPanel, JButton addDoubleCutBtn, JButton removeDoubleCutBtn) {
+        final JTextArea theoremDisplay;
+        workPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+        theoremDisplay = new JTextArea();
+        theoremDisplay.setLineWrap(true);
+        theoremDisplay.setAutoscrolls(true);
+        theoremDisplay.setMargin(new Insets(5, 5, 5, 5));
+        theoremDisplay.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                super.focusGained(e);
+                theoremDisplay.setEditable(false);
+                theoremDisplay.getCaret().setVisible(true);
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                super.focusLost(e);
+            }
+        });
+        theoremDisplay.setPreferredSize(new Dimension(500, 25));
+        workPanel.add(theoremDisplay);
+        JPanel btnPanel = new JPanel();
+        btnPanel.setLayout(new FlowLayout(FlowLayout.LEFT,3,3));
+        buttons.add(addDoubleCutBtn);
+        btnPanel.add(addDoubleCutBtn);
+        buttons.add(removeDoubleCutBtn);
+        btnPanel.add(removeDoubleCutBtn);
+        workPanel.add(btnPanel);
+        addDoubleCutBtn.setToolTipText("Double Cut Introduction");
+        removeDoubleCutBtn.setToolTipText("Double Cut Elimination");
+        return theoremDisplay;
     }
 
     /**
@@ -343,6 +355,8 @@ public class ProofPanel extends JPanel {
         historyPanel.removeAll();
         historyLabels.clear();
         currentDiagram.refresh(logic.getProposition());
+        currentDiagram.setSelectMode(true);
+        draftDiagram.setSelectMode(true);
         goalDiagram.refresh(logic.getTheorem());
         for (Inference i : logic.getHistory()) {
             JLabel l = new JLabel(i.userDisplay());
@@ -392,6 +406,8 @@ public class ProofPanel extends JPanel {
         historyPanel.revalidate();
         historyPanel.repaint();
         currentDiagram.refresh(logic.getProposition());
+        currentDiagram.setSelectMode(true);
+        draftDiagram.setSelectMode(true);
         goalDiagram.refresh(logic.getTheorem());
     }
 
