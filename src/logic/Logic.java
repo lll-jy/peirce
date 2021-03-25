@@ -37,6 +37,8 @@ public class Logic {
     private final Stack<Inference> history;
     private final Stack<Inference> reverseHistory;
     private String filePath;
+    private String theoremString;
+    private final List<String> premiseStrings;
 
     /**
      * Initializes a Logic component based on the model, and initially the default language is Coq, and
@@ -50,6 +52,7 @@ public class Logic {
         this.history = new Stack<>();
         this.reverseHistory = new Stack<>();
         this.filePath = "theorem.txt";
+        this.premiseStrings = new ArrayList<>();
     }
 
     /**
@@ -78,7 +81,8 @@ public class Logic {
      */
     public void addPremise(String str) throws TheoremParseException {
         Proposition prop = parse(str);
-        model.insertPremise(str, prop);
+        premiseStrings.add(str);
+        model.insertPremise(prop);
     }
 
     /**
@@ -102,7 +106,9 @@ public class Logic {
      * @param str the string representing the premise.
      */
     public void deletePremise(String str) {
-        model.removePremise(str);
+        int index = premiseStrings.indexOf(str);
+        premiseStrings.remove(index);
+        model.removePremise(index);
     }
 
     /**
@@ -118,7 +124,7 @@ public class Logic {
      * @return the list of premises.
      */
     public List<String> getPremises() {
-        return model.getPremisesStrings();
+        return premiseStrings;
     }
 
     /**
@@ -137,7 +143,16 @@ public class Logic {
             case DECLARATION -> mode = Mode.PROOF;
             case PROOF -> {
                 mode = Mode.DECLARATION;
-                model.setProposition(model.getTheorem());
+                List<Proposition> premises = model.getPremises();
+                premises.clear();
+                for (String premise : premiseStrings) {
+                    try {
+                        premises.add(parse(premise));
+                    } catch (TheoremParseException e) {
+                        assert false;
+                    }
+                }
+                model.resetProposition();
             }
         }
     }
@@ -173,12 +188,23 @@ public class Logic {
     }
 
     /**
+     * Parses a string of canonical diagram expression to a proposition structure.
+     * @param diagram the canonical diagram string.
+     * @return the Proposition corresponding to the diagram.
+     * @throws TheoremParseException if the input diagram is invalid.
+     */
+    public Proposition parseFrame(String diagram) throws TheoremParseException {
+        return Parser.createParser(getLanguage(), getVariables()).parseFrame(diagram);
+    }
+
+    /**
      * Sets the theorem to prove in this logic instance.
      * @param theorem the new proposition.
      * @throws TheoremParseException if the string representing the theorem is not parsable in the language.
      */
     public void setTheorem(String theorem) throws TheoremParseException {
-        model.setTheorem(theorem, parse(theorem));
+        theoremString = theorem;
+        model.setTheorem(parse(theorem));
     }
 
     /**
@@ -186,7 +212,7 @@ public class Logic {
      * @return the string of the theorem written in the language chosen.
      */
     public String getTheoremString() {
-        return model.getTheoremString();
+        return theoremString;
     }
 
     /**
@@ -259,6 +285,8 @@ public class Logic {
 
     public void clear() {
         clearHistory();
+        premiseStrings.clear();
+        theoremString = "";
         model.clear();
     }
 
@@ -283,6 +311,16 @@ public class Logic {
     public void removeDoubleCut(int s, int e) throws InvalidSelectionException, InvalidInferenceException {
         List<Literal> literals = getSelected(s, e);
         Proposition parent = getCursorProp(s);
+        removeDoubleCut(literals, parent);
+    }
+
+    /**
+     * Removes double cut in the selected part if it is in the form "[ [ proposition ] ]".
+     * @param literals the literal of the double cut.
+     * @param parent the enclosing proposition of the double cut literal.
+     * @throws InvalidInferenceException if the selected part is not in the form "[ [ proposition ] ]".
+     */
+    public void removeDoubleCut(List<Literal> literals, Proposition parent) throws InvalidInferenceException {
         String from = getProposition().toString();
         if (literals.size() != 1) {
             throw new InvalidInferenceException("Please select a single literal to remove double cuts.");
@@ -308,15 +346,34 @@ public class Logic {
     }
 
     /**
+     * Sets the proposition held by the model.
+     * @param prop the new proposition.
+     */
+    public void setProposition(Proposition prop) {
+        model.setProposition(prop);
+    }
+
+    /**
      * Adds a double cut surrounding the selected part.
      * @param s the start index of the selected part.
      * @param e the end index of the selected part (exclusive).
      * @throws InvalidSelectionException if the selected part is not a valid proposition.
      */
     public void addDoubleCut(int s, int e) throws InvalidSelectionException {
-        String from = getProposition().toString();
         List<Literal> literals = getSelected(s, e);
         Proposition parent = getCursorProp(s);
+        addDoubleCut(literals, parent, s);
+    }
+
+    /**
+     * Adds a double cut surrounding the selected part.
+     * @param literals the literals selected.
+     * @param parent the parent of the literals selected.
+     * @param s the index where the resulting literal should insert.
+     * @throws InvalidSelectionException if the selected part is not a valid proposition.
+     */
+    public void addDoubleCut(List<Literal> literals, Proposition parent, int s) throws InvalidSelectionException {
+        String from = getProposition().toString();
         CutLiteral res = new CutLiteral(parent, null);
         Proposition outer = new Proposition(parent.getLevel() + 1, res);
         res.setContent(outer);
@@ -331,6 +388,7 @@ public class Logic {
         } else {
             for (Literal l : literals) {
                 l.increaseLevelBy(2);
+                l.setParent(inner);
             }
             inner.addLiterals(literals);
             parent.replaceLiterals(literals, newLiterals);
@@ -347,9 +405,19 @@ public class Logic {
      * @throws InvalidInferenceException if the part selected is not valid to remove by any inference rule.
      */
     public void cut(int s, int e) throws InvalidSelectionException, InvalidInferenceException {
-        String from = getProposition().toString();
         List<Literal> literals = getSelected(s, e);
         Proposition parent = getCursorProp(s);
+        cut(literals, parent);
+    }
+
+    /**
+     * Performs cut action to remove some part in the theorem by some inference rule.
+     * @param literals the literals to remove.
+     * @param parent the parent of the literals to remove.
+     * @throws InvalidInferenceException if the part selected is not deletable.
+     */
+    public void cut(List<Literal> literals, Proposition parent) throws InvalidInferenceException {
+        String from = getProposition().toString();
         boolean erasureApplied = false;
         boolean deiterationApplied = false;
         for (Literal l : literals) {
@@ -384,12 +452,25 @@ public class Logic {
      */
     public void paste(int pos, String str) throws TheoremParseException,
             InvalidSelectionException, InvalidInferenceException {
-        String from = getProposition().toString();
-        Proposition prop = Parser.createParser(language, getVariables()).parseFrame(str);
+        Proposition prop = parseFrame(str);
         Proposition parent = getCursorProp(pos);
+        paste(prop, parent, pos);
+    }
+
+    /**
+     * Performs paste action to insert some diagrams to the theorem by some inference rule.
+     * @param toInsert the proposition to insert.
+     * @param parent the parent, i.e. destination proposition to insert.
+     * @param pos the index of the parent to insert.
+     * @throws InvalidSelectionException if the cursor position is invalid to insert anything.
+     * @throws InvalidInferenceException if the proposition cannot be inserted by any inference rule.
+     */
+    public void paste(Proposition toInsert, Proposition parent, int pos) throws
+            InvalidSelectionException, InvalidInferenceException {
+        String from = getProposition().toString();
         boolean insertionApplied = false;
         boolean iterationApplied = false;
-        for (Literal l : prop.getLiterals()) {
+        for (Literal l : toInsert.getLiterals()) {
             InferenceRule rule = parent.getInsertRule(l);
             switch (rule) {
                 case INSERTION -> insertionApplied = true;
@@ -397,8 +478,8 @@ public class Logic {
             }
             l.setParent(parent);
         }
-        prop.increaseLevelBy(parent.getLevel() + 1);
-        parent.insertLiterals(pos, prop.getLiterals());
+        toInsert.increaseLevelBy(parent.getLevel());
+        parent.insertLiterals(pos, toInsert.getLiterals());
         String to = getProposition().toString();
         if (insertionApplied) {
             if (iterationApplied) {
@@ -469,10 +550,6 @@ public class Logic {
         return history;
     }
 
-    public void dummy() {
-        System.out.println("called here");
-    }
-
     /**
      * Saves the current proof to file.
      */
@@ -500,6 +577,12 @@ public class Logic {
         filePath = path;
     }
 
+    /**
+     * Opens the file at the given path.
+     * @param path the file path.
+     * @throws FilePathException if the file path is invalid.
+     * @throws FileReadException if the file content format is invalid.
+     */
     public void open(String path) throws FilePathException, FileReadException {
         filePath = path;
         Storage.loadFile(path, this);

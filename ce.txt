@@ -1,0 +1,19 @@
+a b c 
+Coq
+3
+a->c
+b->c
+a\/b
+c
+11
+ITERATION&[ a [ c ] ] [ b [ c ] ] [ [ a ] [ b ] ] &[ a [ c ] ] [ b [ c ] ] [ [ [ a [ c ] ] a ] [ b ] ] 
+DEITERATION&[ a [ c ] ] [ b [ c ] ] [ [ [ a [ c ] ] a ] [ b ] ] &[ a [ c ] ] [ b [ c ] ] [ [ [ [ c ] ] a ] [ b ] ] 
+ERASURE&[ a [ c ] ] [ b [ c ] ] [ [ [ [ c ] ] a ] [ b ] ] &[ a [ c ] ] [ b [ c ] ] [ [ [ [ c ] ] ] [ b ] ] 
+ERASURE&[ a [ c ] ] [ b [ c ] ] [ [ [ [ c ] ] ] [ b ] ] &[ b [ c ] ] [ [ [ [ c ] ] ] [ b ] ] 
+ITERATION&[ b [ c ] ] [ [ [ [ c ] ] ] [ b ] ] &[ b [ c ] ] [ [ [ [ c ] ] ] [ [ b [ c ] ] b ] ] 
+ERASURE&[ b [ c ] ] [ [ [ [ c ] ] ] [ [ b [ c ] ] b ] ] &[ [ [ [ c ] ] ] [ [ b [ c ] ] b ] ] 
+DEITERATION&[ [ [ [ c ] ] ] [ [ b [ c ] ] b ] ] &[ [ [ [ c ] ] ] [ [ [ c ] ] b ] ] 
+ERASURE&[ [ [ [ c ] ] ] [ [ [ c ] ] b ] ] &[ [ [ [ c ] ] ] [ [ [ c ] ] ] ] 
+DEITERATION&[ [ [ [ c ] ] ] [ [ [ c ] ] ] ] &[ [ [ [ c ] ] ] ] 
+DOUBLE_CUT_ELIM&[ [ [ [ c ] ] ] ] &[ [ c ] ] 
+DOUBLE_CUT_ELIM&[ [ c ] ] &c 

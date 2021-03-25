@@ -126,6 +126,9 @@ public abstract class Parser {
                 proposition.addLiteral(new GroundLiteral(proposition, peirceFrames[i]));
             }
         }
+        if (level != 0) {
+            throw new TheoremParseException(INVALID_SYNTAX_ERR_MSG);
+        }
         return proposition;
     }
 

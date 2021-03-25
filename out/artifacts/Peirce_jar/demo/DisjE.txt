@@ -1,0 +1,18 @@
+p q r 
+Coq
+3
+p\/q
+p->r
+q->r
+r
+10
+ITERATION&[ [ p ] [ q ] ] [ p [ r ] ] [ q [ r ] ] &[ [ [ p [ r ] ] p ] [ q ] ] [ p [ r ] ] [ q [ r ] ] 
+DEITERATION&[ [ [ p [ r ] ] p ] [ q ] ] [ p [ r ] ] [ q [ r ] ] &[ [ [ [ r ] ] p ] [ q ] ] [ p [ r ] ] [ q [ r ] ] 
+ERASURE&[ [ [ [ r ] ] p ] [ q ] ] [ p [ r ] ] [ q [ r ] ] &[ [ [ [ r ] ] ] [ q ] ] [ p [ r ] ] [ q [ r ] ] 
+ITERATION&[ [ [ [ r ] ] ] [ q ] ] [ p [ r ] ] [ q [ r ] ] &[ [ [ [ r ] ] ] [ [ q [ r ] ] q ] ] [ p [ r ] ] [ q [ r ] ] 
+DEITERATION&[ [ [ [ r ] ] ] [ [ q [ r ] ] q ] ] [ p [ r ] ] [ q [ r ] ] &[ [ [ [ r ] ] ] [ [ [ r ] ] q ] ] [ p [ r ] ] [ q [ r ] ] 
+ERASURE&[ [ [ [ r ] ] ] [ [ [ r ] ] q ] ] [ p [ r ] ] [ q [ r ] ] &[ [ [ [ r ] ] ] [ [ [ r ] ] ] ] [ p [ r ] ] [ q [ r ] ] 
+ERASURE&[ [ [ [ r ] ] ] [ [ [ r ] ] ] ] [ p [ r ] ] [ q [ r ] ] &[ [ [ [ r ] ] ] [ [ [ r ] ] ] ] 
+DEITERATION&[ [ [ [ r ] ] ] [ [ [ r ] ] ] ] &[ [ [ [ r ] ] ] ] 
+DOUBLE_CUT_ELIM&[ [ [ [ r ] ] ] ] &[ [ r ] ] 
+DOUBLE_CUT_ELIM&[ [ r ] ] &r 

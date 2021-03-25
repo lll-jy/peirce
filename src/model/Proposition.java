@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class Proposition {
     private int level;
-    private final CutLiteral enclosingLiteral;
+    private CutLiteral enclosingLiteral;
     private final List<Literal> literals;
 
     /**
@@ -278,6 +278,14 @@ public class Proposition {
     }
 
     /**
+     * Sets the enclosing literal.
+     * @param literal the new enclosing literal.
+     */
+    public void setEnclosingLiteral(CutLiteral literal) {
+        enclosingLiteral = literal;
+    }
+
+    /**
      * Gets the inference rule applied if the literal is inserted to this proposition.
      * @param literal the literal to insert.
      * @return the rule applied for this insertion.
@@ -320,6 +328,23 @@ public class Proposition {
         for (Literal l : literals) {
             l.increaseLevelBy(inc);
         }
+    }
+
+    /**
+     * Makes a copy of this proposition instance.
+     * @return the copied instance.
+     */
+    public Proposition copy() {
+        Proposition prop = new Proposition();
+        List<Literal> copiedLiterals = new ArrayList<>();
+        for (Literal l : literals) {
+            copiedLiterals.add(l.copy());
+        }
+        for (Literal l : copiedLiterals) {
+            l.setParent(prop);
+        }
+        prop.addLiterals(copiedLiterals);
+        return prop;
     }
 
     @Override

@@ -29,6 +29,14 @@ public class CutLiteral extends Literal {
         this.content = content;
     }
 
+    /**
+     * Gets the content of the literal.
+     * @return the content of the literal.
+     */
+    public Proposition getContent() {
+        return content;
+    }
+
     @Override
     public int getLength() {
         return 2 + content.getLength();
@@ -74,6 +82,15 @@ public class CutLiteral extends Literal {
     @Override
     public void increaseLevelBy(int inc) {
         content.increaseLevelBy(inc);
+    }
+
+    @Override
+    public Literal copy() {
+        Proposition copiedProp = content.copy();
+        copiedProp.increaseLevelBy(1);
+        CutLiteral copiedThis = new CutLiteral(null, copiedProp);
+        copiedProp.setEnclosingLiteral(copiedThis);
+        return copiedThis;
     }
 
     @Override

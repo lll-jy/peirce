@@ -32,6 +32,7 @@ public class InputPanel extends JScrollPane {
     private final JPanel theoremHeader;
     private final JTextArea theoremInput;
     private final JPanel startProofBtnPanel;
+    private final JButton startProofBtn;
     private final List<JButton> buttons;
 
     /**
@@ -96,7 +97,7 @@ public class InputPanel extends JScrollPane {
         theoremInput.setMargin(new Insets(5, 5, 5, 5));
 
         startProofBtnPanel = new JPanel();
-        JButton startProofBtn = new JButton(DECLARATION_TO_PROOF_BTN_MSG);
+        startProofBtn = new JButton(DECLARATION_TO_PROOF_BTN_MSG);
         startProofBtnPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
         startProofBtnPanel.add(startProofBtn);
         startProofBtn.addActionListener(e -> {
@@ -107,16 +108,16 @@ public class InputPanel extends JScrollPane {
                     logic.setLanguage((String) langSelector.getSelectedItem());
                     for (JButton button : buttons) {
                         button.setEnabled(false);
-                        variableInput.setEditable(false);
-                        premiseInput.setEditable(false);
-                        theoremInput.setEditable(false);
                     }
+                    variableInput.setEditable(false);
+                    premiseInput.setEditable(false);
+                    theoremInput.setEditable(false);
                     logic.switchMode();
                     for (Card card : variables) {
-                        card.switchEditable();
+                        card.setEditable(false);
                     }
                     for (Card card : premises) {
-                        card.switchEditable();
+                        card.setEditable(false);
                     }
                     logic.clearHistory();
                     refreshParent.run();
@@ -136,17 +137,32 @@ public class InputPanel extends JScrollPane {
                 variableInput.setEditable(true);
                 premiseInput.setEditable(true);
                 theoremInput.setEditable(true);
+                for (Card card : variables) {
+                    card.setEditable(true);
+                }
+                for (Card card : premises) {
+                    card.setEditable(true);
+                }
+                logic.switchMode();
                 JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
                         "Records in the proof panel will be cleared",
                         "Warning",
                         JOptionPane.WARNING_MESSAGE);
-                logic.switchMode();
-                for (Card card : variables) {
-                    card.switchEditable();
+            }
+        });
+
+        langSelector.addActionListener(e -> {
+            if (!premises.isEmpty()) {
+                if (langSelector.getSelectedIndex() == 0) {
+                    langSelector.setSelectedIndex(1);
+                } else {
+                    langSelector.setSelectedIndex(0);
                 }
-                for (Card card : premises) {
-                    card.switchEditable();
-                }
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
+                        "Some premises are not written in this language. " +
+                                "Please clear your premises before changing language.",
+                                "Language switch error",
+                                JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -216,6 +232,7 @@ public class InputPanel extends JScrollPane {
      * Refresh this panel.
      */
     private void constructPanel() {
+        boolean isEditable = logic.canModifyDeclaration();
         panel.removeAll();
         panel.revalidate();
         panel.repaint();
@@ -223,16 +240,26 @@ public class InputPanel extends JScrollPane {
         panel.add(variableInput);
         for (Card variableCard : variables) {
             panel.add(variableCard);
+            variableCard.setEditable(isEditable);
         }
         panel.add(langSelectorPanel);
         panel.add(premiseHeader);
         panel.add(premiseInput);
         for (Card premiseCard : premises) {
             panel.add(premiseCard);
+            premiseCard.setEditable(isEditable);
         }
         panel.add(theoremHeader);
         panel.add(theoremInput);
         panel.add(startProofBtnPanel);
+        for (JButton button : buttons) {
+            button.setEnabled(isEditable);
+        }
+        if (isEditable) {
+            startProofBtn.setText("Start proof");
+        } else {
+            startProofBtn.setText("Edit declaration");
+        }
     }
 
     /**
