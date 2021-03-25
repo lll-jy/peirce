@@ -1,9 +1,0 @@
-a 
-Coq
-0
-a
-4
-DOUBLE_CUT_INTRO&&[ [ ] ] 
-INSERTION&[ [ ] ] &[ [ ] a ] 
-DOUBLE_CUT_INTRO&[ [ ] a ] &[ [ [ [ ] a ] ] ] 
-INSERTION&[ [ [ [ ] a ] ] ] &[ [ [ [ ] a ] ] a ] 

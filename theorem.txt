@@ -1,5 +1,0 @@
-p 
-0[ p [ p ] ] 
-DOUBLE_CUT_INTRO||[ [ ] ] 
-INSERTION|[ [ ] ] |[ [ ] p ] 
-ITERATION|[ [ ] p ] |[ [ p ] p ] 
